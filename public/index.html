@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL Rank Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            color: #f8fafc;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #app-scale-wrapper {
+            width: 1280px;  
+            height: 800px; 
+            position: relative;
+            transform-origin: center center;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+        }
+
+        #app-scroll-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #app-scroll-container::-webkit-scrollbar { width: 8px; }
+        #app-scroll-container::-webkit-scrollbar-track { background: transparent; }
+        #app-scroll-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        #app-scroll-container::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.2s;
+        }
+        .glass-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+            outline: none;
+        }
+
+        .history-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        .history-chip:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .history-content {
+            cursor: pointer;
+            padding: 0.25rem 0 0.25rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .history-delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 10px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        .history-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .rank-glow { text-shadow: 0 0 20px currentColor; }
+        
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        input[type="checkbox"] {
+            accent-color: #3b82f6;
+            width: 16px;
+            height: 16px;
+        }
+        
+        #floatingPopup {
+            resize: both;
+            overflow: hidden;
+            min-width: 150px;
+            min-height: 100px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            container-type: size;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #floatingPopup.hidden { display: none; }
+        
+        #popupHeader {
+            flex-shrink: 0; height: 32px; cursor: move;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 8px; background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+        }
+
+        #popupBody {
+            flex-grow: 1; width: 100%; height: calc(100% - 32px);
+            position: relative; overflow: hidden;
+        }
+
+        .cq-container { width: 100%; height: 100%; }
+
+        /* 通常モードのレイアウト */
+        .layout-normal {
+            display: flex; flex-direction: column; width: 100%; height: 100%;
+            padding: 2cqh; box-sizing: border-box; align-items: center;
+        }
+        .layout-normal .section-icon {
+            flex: 0 0 45%; display: flex; align-items: center;
+            justify-content: center; width: 100%; overflow: hidden; padding-bottom: 1cqh;
+        }
+        .layout-normal .cq-rank-icon {
+            height: 100%; width: auto; max-width: 80%;
+            object-fit: contain; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+        }
+        .layout-normal .section-info {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-start; width: 100%;
+            gap: 1cqh; padding-top: 1cqh;
+        }
+        .layout-normal .cq-rank-text {
+            font-size: 13cqh; width: 100%; text-align: center;
+            white-space: nowrap; line-height: 1; font-weight: 900;
+        }
+        .layout-normal .cq-lp-text { 
+            font-size: 10cqh; line-height: 1; font-family: monospace;
+            color: #4ade80; font-weight: 700; margin-bottom: 2cqh;
+        }
+        .layout-normal .cq-stats-group { display: flex; align-items: center; gap: 6cqw; }
+        .layout-normal .cq-stat-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .layout-normal .cq-stat-label { font-size: 12cqh; margin-bottom: 0.5cqh; font-weight: bold; line-height: 1; }
+        .layout-normal .cq-stat-value { font-size: 9cqh; font-weight: 800; line-height: 1; color: white; }
+
+        /* LIVEモードのレイアウト（修正後） */
+        .layout-live {
+            display: flex; flex-direction: row; align-items: center;
+            padding: 0 12px; background: transparent; gap: 15px;
+            height: 100%; width: 100%; box-sizing: border-box;
+            justify-content: flex-start; /* 左寄せ */
+        }
+        .layout-live .cq-rank-icon {
+            height: 90cqh; width: auto; max-width: 25cqw;
+            object-fit: contain; filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+            flex-shrink: 0;
+        }
+        .layout-live .cq-content {
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: flex-start; height: 100%; flex-grow: 1;
+            gap: 4cqh; /* 上下の行間 */
+        }
+        
+        .layout-live .cq-rank-row {
+            display: flex; flex-direction: row; align-items: baseline; gap: 10px;
+        }
+        .layout-live .cq-rank-text {
+            font-size: 34cqh; font-weight: 900; white-space: nowrap;
+            text-shadow: 0 0 3px rgba(0,0,0,0.8); line-height: 1; text-align: left;
+        }
+        .layout-live .cq-lp-text { 
+            font-size: 20cqh; font-family: monospace; color: #4ade80;
+            font-weight: 700; line-height: 1;
+        }
+
+        .layout-live .cq-stats-row {
+            display: flex; flex-direction: row; align-items: center; gap: 15px;
+        }
+        .layout-live .cq-stat-item { display: flex; align-items: center; gap: 4px; }
+        .layout-live .cq-stat-label { font-size: 20cqh; opacity: 0.9; font-weight: bold; line-height: 1; }
+        .layout-live .cq-stat-value { font-size: 20cqh; color: white; font-weight: 800; line-height: 1; }
+
+        .layout-live .history-bar {
+            display: flex; align-items: center; gap: 2px;
+            height: 16cqh; margin-left: 5px;
+        }
+        .layout-live .history-block {
+            width: 8px; min-width: 4px; height: 100%; border-radius: 2px; opacity: 0.9;
+        }
+        .block-win { background-color: #3b82f6; box-shadow: 0 0 2px rgba(59, 130, 246, 0.4); }
+        .block-loss { background-color: #f87171; box-shadow: 0 0 2px rgba(248, 113, 113, 0.4); }
+
+        .btn-live-toggle {
+            font-size: 10px; padding: 3px 10px; background: #2563eb; color: white;
+            border-radius: 4px; border: none; cursor: pointer; transition: all 0.2s;
+            font-weight: bold; letter-spacing: 0.5px;
+        }
+        .btn-live-toggle:hover { background: #1d4ed8; }
+        .btn-live-toggle.active-mode { background: #059669; }
+        .btn-live-toggle.active-mode:hover { background: #047857; }
+
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-scale-wrapper">
+        <div id="app-scroll-container">
+            <header class="w-full glass-panel border-b border-white/10 sticky top-0 z-40">
+                <div class="max-w-6xl mx-auto px-4 py-4 flex flex-row items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-blue-100 to-white leading-tight" data-i18n="appTitle">
+                                LoL Rank Checker
+                            </h1>
+                            <p class="text-[10px] text-blue-300/80 font-medium tracking-wide uppercase leading-tight" data-i18n="appSubtitle">
+                                Summoner Analytics
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="langSelect" onchange="changeLanguage()" class="bg-slate-800 text-xs text-slate-300 border border-slate-700 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                            <option value="ja">🇯🇵 日本語</option>
+                            <option value="en">🇺🇸 English</option>
+                            <option value="ko">🇰🇷 한국어</option>
+                            <option value="zh">🇨🇳 中文</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-grow flex flex-col items-center p-4 pt-8 sm:pt-12 relative">
+                <div class="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-start justify-center">
+                    
+                    <div class="w-full max-w-lg flex flex-col gap-6">
+                        <div class="glass-panel p-6 rounded-2xl shadow-2xl relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                            <div class="flex flex-col gap-4">
+                                <div class="flex gap-2">
+                                    <div class="w-2/3">
+                                        <label class="block text-[10px] text-gray-400 mb-1 ml-1" data-i18n="lblGameName">Game Name</label>
+                                        <input type="text" id="gameName" placeholder="Name" class="w-full glass-input rounded-lg px-4 py-2.5" data-i18n-placeholder="phGameName">
+                                    </div>
+                                    <div class="w-1/3">
+                                        <label class="block text-[10px] text-gray-400 mb-1 ml-1" data-i18n="lblTagLine">Tag Line</label>
+                                        <input type="text" id="tagLine" placeholder="#Tag" class="w-full glass-input rounded-lg px-4 py-2.5" data-i18n-placeholder="phTagLine">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-gray-400 mb-1 ml-1" data-i18n="lblRegion">Region</label>
+                                    <select id="region" class="w-full glass-input rounded-lg px-4 py-2.5 appearance-none cursor-pointer">
+                                        <option value="jp1" selected>Japan (JP)</option>
+                                        <option value="na1">North America (NA)</option>
+                                        <option value="euw1">Europe West (EUW)</option>
+                                        <option value="kr">Korea (KR)</option>
+                                    </select>
+                                </div>
+                                <div id="historyContainer" class="hidden">
+                                    <label class="block text-[10px] text-gray-500 mb-1.5 ml-1" data-i18n="lblHistory">Recent Searches</label>
+                                    <div id="historyList" class="flex flex-wrap gap-2 mb-2"></div>
+                                </div>
+                                <div class="flex flex-col gap-3 mt-2">
+                                    <button onclick="startSequentialFetch()" id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
+                                        <span data-i18n="btnSearch">Fetch Stats</span>
+                                    </button>
+                                    <div class="flex items-center justify-between px-1">
+                                        <label class="flex items-center gap-2 cursor-pointer group">
+                                            <div class="relative flex items-center">
+                                                <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" class="peer sr-only">
+                                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors" data-i18n="lblAutoRefresh">Auto Refresh (20m)</span>
+                                            </div>
+                                            <span id="timerLabel" class="text-xs text-blue-400 font-mono ml-2 hidden"></span>
+                                        </label>
+                                        <button onclick="toggleFloatingPopup()" class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                                            <span data-i18n="btnPopup">Popup Monitor</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="fetchProgress" class="hidden glass-panel p-5 rounded-xl border-white/5">
+                            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest text-center" data-i18n="progressTitle">Analyzing Data</h3>
+                            <div class="space-y-4">
+                                <div id="step-account" class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
+                                    <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">1</div>
+                                    <span class="text-sm font-medium" data-i18n="stepIdentity">Verify Identity (PUUID)</span>
+                                </div>
+                                <div id="step-league" class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
+                                    <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">2</div>
+                                    <span class="text-sm font-medium" data-i18n="stepRank">Check Rank Tier & LP</span>
+                                </div>
+                                <div id="step-matches" class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
+                                    <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">3</div>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-medium" data-i18n="stepMatches">Scan Last 20 Ranked Matches</span>
+                                        <span id="matchCountLabel" class="text-[10px] text-blue-400 font-mono h-4"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="errorMsg" class="hidden p-4 bg-red-950/40 border border-red-500/50 text-red-200 rounded-lg text-sm text-center flex flex-col items-center gap-2 backdrop-blur-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            <span id="errorText"></span>
+                        </div>
+                    </div>
+
+                    <div id="resultArea" class="hidden w-full max-w-lg glass-panel p-8 rounded-2xl shadow-2xl text-center border-t border-white/10">
+                        <div id="playerInfo" class="animate-fade-in-up">
+                            <h2 id="displayName" class="text-3xl font-bold mb-1 text-white tracking-tight"></h2>
+                            <div class="flex flex-col items-center mt-6">
+                                <div id="rankIconContainer" class="relative mb-4">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent blur-xl rounded-full"></div>
+                                    <img id="rankIcon" src="png/Iron.png" class="relative w-48 h-48 object-contain drop-shadow-2xl transform hover:scale-110 transition-transform duration-300 select-none" alt="Rank Icon">
+                                </div>
+                                <div id="rankText" class="text-4xl font-black uppercase tracking-wider rank-glow mb-1"></div>
+                                <div id="lpValue" class="text-lg text-blue-200/80 font-mono bg-blue-900/20 px-3 py-1 rounded-full border border-blue-500/20"></div>
+                                
+                                <div class="mt-8 w-full bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4" data-i18n="lblRecentResults">Last 20 Matches</div>
+                                    <div class="grid grid-cols-2 gap-4 divide-x divide-slate-700/50">
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-[10px] text-blue-400 font-bold mb-1" data-i18n="lblWins">WINS</span>
+                                            <span id="winCount" class="text-2xl font-black text-white">0</span>
+                                        </div>
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-[10px] text-rose-400 font-bold mb-1" data-i18n="lblLosses">LOSSES</span>
+                                            <span id="lossCount" class="text-2xl font-black text-white">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="seasonTotalSection" class="mt-4 w-full bg-slate-800/30 rounded-xl p-4 border border-slate-700/30">
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4" data-i18n="lblSeasonTotal">Season Total</div>
+                                    <div class="grid grid-cols-3 gap-4 divide-x divide-slate-700/30">
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-[10px] text-emerald-500/70 font-bold mb-1" data-i18n="lblWins">WINS</span>
+                                            <span id="totalWinCount" class="text-xl font-bold text-gray-200">0</span>
+                                        </div>
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-[10px] text-rose-500/70 font-bold mb-1" data-i18n="lblLosses">LOSSES</span>
+                                            <span id="totalLossCount" class="text-xl font-bold text-gray-200">0</span>
+                                        </div>
+                                        <div class="flex flex-col items-center justify-center">
+                                            <span class="text-[10px] text-blue-500/70 font-bold mb-1" data-i18n="lblWinRate">WIN RATE</span>
+                                            <span id="totalWinRatio" class="text-lg font-bold text-gray-300">0%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-[10px] text-gray-500" id="lastUpdatedLabel"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="mt-auto py-6 text-center text-[10px] text-gray-600">
+                    <p>Data provided by Riot Games API via Vercel Serverless Proxy.</p>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <!-- Draggable Popup -->
+    <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl" style="top: 100px; left: 50%; transform: translateX(-50%); width: 400px; height: 320px;">
+        <div id="popupHeader">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span class="text-[10px] font-bold text-gray-300 tracking-wider">RANK MONITOR</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
+                <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="popupBody">
+            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                No Data.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_HISTORY = 10;
+        
+        let refreshTimerId = null;
+        let nextRefreshTime = 0;
+        const REFRESH_INTERVAL_MS = 20 * 60 * 1000;
+
+        let currentData = null;
+        let isLiveMode = false;
+
+        const i18n = {
+            ja: {
+                appTitle: "LoLランクチェッカー",
+                appSubtitle: "サモナー戦績分析",
+                lblGameName: "サモナー名 (Game Name)",
+                lblTagLine: "タグ (#なし)",
+                phGameName: "サモナー名",
+                phTagLine: "#タグ",
+                lblRegion: "サーバー (Region)",
+                lblHistory: "最近の検索",
+                lblAutoRefresh: "自動更新 (20分毎)",
+                btnSearch: "戦績を取得する",
+                btnPopup: "ポップアップで開く",
+                progressTitle: "データを分析中...",
+                stepIdentity: "アカウント特定 (PUUID)",
+                stepRank: "現在のランクとLPを取得",
+                stepMatches: "直近20戦のランク戦をスキャン",
+                lblRecentResults: "直近20戦の結果",
+                lblWins: "勝利",
+                lblLosses: "敗北",
+                lblWinRate: "勝率",
+                lblSeasonTotal: "今シーズンの通算成績"
+            },
+            en: {
+                appTitle: "LoL Rank Checker",
+                appSubtitle: "Summoner Analytics",
+                lblGameName: "Game Name",
+                lblTagLine: "Tag Line (No #)",
+                phGameName: "Game Name",
+                phTagLine: "#Tag",
+                lblRegion: "Region",
+                lblHistory: "Recent Searches",
+                lblAutoRefresh: "Auto Refresh (20m)",
+                btnSearch: "Fetch Stats",
+                btnPopup: "Show Popup",
+                progressTitle: "Analyzing Data...",
+                stepIdentity: "Verify Identity (PUUID)",
+                stepRank: "Check Rank Tier & LP",
+                stepMatches: "Scan Last 20 Ranked Matches",
+                lblRecentResults: "Last 20 Matches Results",
+                lblWins: "WINS",
+                lblLosses: "LOSSES",
+                lblWinRate: "WIN RATE",
+                lblSeasonTotal: "SEASON TOTAL"
+            }
+        };
+
+        function adjustAppScale() {
+            const wrapper = document.getElementById('app-scale-wrapper');
+            const baseWidth = 1280;
+            const baseHeight = 800;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const scaleX = windowWidth / baseWidth;
+            const scaleY = windowHeight / baseHeight;
+            const scale = Math.min(scaleX, scaleY); 
+            wrapper.style.transform = `scale(${scale})`;
+        }
+        
+        window.addEventListener('resize', adjustAppScale);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.protocol === 'file:') {
+                alert("【重要】\nこのアプリはAPIプロキシを使用するため、Webサーバー上で動作させる必要があります。\nVercel等にデプロイするか、ローカルサーバー(localhost)経由で開いてください。\n直接HTMLファイルを開くとAPI通信が動作しません。");
+            }
+            renderHistory();
+            changeLanguage();
+            initDraggable();
+            adjustAppScale();
+        });
+
+        function initDraggable() {
+            const popup = document.getElementById("floatingPopup");
+            const header = document.getElementById("popupHeader");
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            header.addEventListener("mousedown", (e) => {
+                if (e.target.closest('button')) return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                const rect = popup.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+                popup.style.transform = 'none'; 
+                popup.style.left = `${initialLeft}px`;
+                popup.style.top = `${initialTop}px`;
+                document.body.style.userSelect = "none";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                popup.style.left = `${initialLeft + (e.clientX - startX)}px`;
+                popup.style.top = `${initialTop + (e.clientY - startY)}px`;
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                document.body.style.userSelect = "auto";
+            });
+        }
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSelect').value;
+            const texts = i18n[lang] || i18n['en'];
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (texts[key]) el.innerText = texts[key];
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (texts[key]) el.placeholder = texts[key];
+            });
+        }
+
+        function saveToHistory(name, tag, region) {
+            let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
+            history = history.filter(item => !(item.name.toLowerCase() === name.toLowerCase() && item.tag.toLowerCase() === tag.toLowerCase()));
+            history.unshift({ name, tag, region });
+            if (history.length > MAX_HISTORY) history.pop();
+            localStorage.setItem('lol_search_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function removeFromHistory(name, tag, event) {
+            if (event) event.stopPropagation();
+            let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
+            history = history.filter(item => !(item.name === name && item.tag === tag));
+            localStorage.setItem('lol_search_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function applyHistory(name, tag, region) {
+            document.getElementById('gameName').value = name;
+            document.getElementById('tagLine').value = tag;
+            document.getElementById('region').value = region;
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
+            const container = document.getElementById('historyContainer');
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            if (history.length === 0) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
+            
+            history.forEach(item => {
+                const chip = document.createElement('div');
+                chip.className = 'history-chip text-[10px] text-blue-200 rounded-full';
+                const nameEsc = item.name.replace(/'/g, "\\'");
+                const tagEsc = item.tag.replace(/'/g, "\\'");
+                const regionEsc = item.region;
+                
+                chip.innerHTML = `
+                    <div class="history-content" onclick="applyHistory('${nameEsc}', '${tagEsc}', '${regionEsc}')">
+                        <span>${item.name}</span>
+                        <span class="text-gray-500">#${item.tag}</span>
+                    </div>
+                    <div class="history-delete-btn" onclick="removeFromHistory('${nameEsc}', '${tagEsc}', event)">✕</div>
+                `;
+                list.appendChild(chip);
+            });
+        }
+
+        function toggleAutoRefresh() {
+            const isChecked = document.getElementById('autoRefreshToggle').checked;
+            const timerLabel = document.getElementById('timerLabel');
+
+            if (isChecked) {
+                nextRefreshTime = Date.now() + REFRESH_INTERVAL_MS;
+                refreshTimerId = setInterval(updateTimerAndFetch, 1000);
+                updateTimerAndFetch(); 
+                timerLabel.classList.remove('hidden');
+            } else {
+                if (refreshTimerId) { clearInterval(refreshTimerId); refreshTimerId = null; }
+                timerLabel.classList.add('hidden');
+                timerLabel.innerText = '';
+            }
+        }
+
+        function updateTimerAndFetch() {
+            const now = Date.now();
+            const diff = nextRefreshTime - now;
+
+            if (diff <= 0) {
+                startSequentialFetch(true);
+                nextRefreshTime = now + REFRESH_INTERVAL_MS;
+                const m = Math.floor(REFRESH_INTERVAL_MS / 60000);
+                document.getElementById('timerLabel').innerText = `(${m}:00)`;
+            } else {
+                const m = Math.floor(diff / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                document.getElementById('timerLabel').innerText = `(${m}:${s.toString().padStart(2, '0')})`;
+            }
+        }
+
+        function toggleFloatingPopup() {
+            const popup = document.getElementById('floatingPopup');
+            if (popup.classList.contains('hidden')) {
+                if (!currentData) { 
+                    alert("Please fetch stats first."); 
+                    return; 
+                }
+                isLiveMode = false;
+                updateModeBtn();
+                renderPopupContent();
+                popup.classList.remove('hidden');
+                popup.style.width = '400px';
+                popup.style.height = '320px';
+            }
+        }
+
+        function closeFloatingPopup() {
+            document.getElementById('floatingPopup').classList.add('hidden');
+        }
+
+        function togglePopupMode() {
+            isLiveMode = !isLiveMode;
+            updateModeBtn();
+            const popup = document.getElementById('floatingPopup');
+            
+            if (isLiveMode) {
+                popup.style.width = '620px';
+                popup.style.height = '100px';
+            } else {
+                popup.style.width = '400px';
+                popup.style.height = '320px';
+            }
+            renderPopupContent();
+        }
+
+        function updateModeBtn() {
+            const btn = document.getElementById('modeToggleBtn');
+            if (isLiveMode) {
+                btn.innerText = "LIVE MODE: ON";
+                btn.classList.add('active-mode');
+            } else {
+                btn.innerText = "LIVE MODE: OFF";
+                btn.classList.remove('active-mode');
+            }
+        }
+
+        function renderPopupContent() {
+            if (!currentData) return;
+            const container = document.getElementById('popupContentContainer');
+            const { tier, rank, lp, wins, losses, history } = currentData;
+            
+            let rankImgHtml = '';
+            if (tier !== "UNRANKED") {
+                let imgName = (tier === "IRON") ? "Iron.png" : `${tier.toLowerCase()}.png`;
+                rankImgHtml = `<img src="png/${imgName}" class="cq-rank-icon" alt="${tier}">`;
+            }
+            const color = getTierColor(tier);
+
+            if (isLiveMode) {
+                let historyHtml = '';
+                if (history && history.length > 0) {
+                    historyHtml = `<div class="history-bar">`;
+                    history.forEach(isWin => {
+                        const className = isWin ? 'block-win' : 'block-loss';
+                        historyHtml += `<div class="history-block ${className}"></div>`;
+                    });
+                    historyHtml += `</div>`;
+                }
+
+                container.innerHTML = `
+                    <div class="cq-container layout-live">
+                        ${rankImgHtml}
+                        <div class="cq-content">
+                            <div class="cq-rank-row">
+                                <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
+                                <div class="cq-lp-text">${lp} LP</div>
+                            </div>
+                            <div class="cq-stats-row">
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #60a5fa">W</div>
+                                    <div class="cq-stat-value">${wins}</div>
+                                </div>
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #f87171">L</div>
+                                    <div class="cq-stat-value">${losses}</div>
+                                </div>
+                                ${historyHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="cq-container layout-normal">
+                        <div class="section-icon">
+                            ${rankImgHtml}
+                        </div>
+                        <div class="section-info">
+                            <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
+                            <div class="cq-lp-text">${lp} LP</div>
+                            <div class="cq-stats-group">
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #60a5fa">W</div>
+                                    <div class="cq-stat-value">${wins}</div>
+                                </div>
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #f87171">L</div>
+                                    <div class="cq-stat-value">${losses}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function startSequentialFetch(isAutoRefresh = false) {
+            const nameInput = document.getElementById('gameName').value.trim();
+            const tagInput = document.getElementById('tagLine').value.trim().replace('#', '');
+            const region = document.getElementById('region').value;
+
+            if (!nameInput || !tagInput) return;
+
+            if (!isAutoRefresh) {
+                document.getElementById('fetchProgress').classList.remove('hidden');
+                document.getElementById('resultArea').classList.add('hidden');
+                document.getElementById('errorMsg').classList.add('hidden');
+                resetSteps();
+                saveToHistory(nameInput, tagInput, region);
+            }
+
+            try {
+                let route = "asia";
+                if (["na1", "br1", "la1", "la2"].includes(region)) route = "americas";
+                if (["euw1", "eun1", "tr1", "ru"].includes(region)) route = "europe";
+
+                updateStepUI('step-account', 'loading');
+                const accountData = await fetchWithRetry(`https://${route}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(nameInput)}/${encodeURIComponent(tagInput)}`);
+                updateStepUI('step-account', 'success');
+
+                updateStepUI('step-league', 'loading');
+                const leagueData = await fetchWithRetry(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}`);
+                updateStepUI('step-league', 'success');
+
+                updateStepUI('step-matches', 'loading');
+                const matchIds = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${accountData.puuid}/ids?start=0&count=20&type=ranked`);
+                
+                let wins = 0, losses = 0;
+                let history = [];
+
+                for (let i = 0; i < matchIds.length; i++) {
+                    try {
+                        const matchData = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/${matchIds[i]}`);
+                        if (matchData && matchData.info && matchData.info.participants) {
+                            const participant = matchData.info.participants.find(p => p.puuid === accountData.puuid);
+                            if (participant) { 
+                                const isWin = participant.win;
+                                if (isWin) { wins++; history.push(true); }
+                                else { losses++; history.push(false); }
+                            }
+                        }
+                        // Progress update
+                        const label = document.getElementById('matchCountLabel');
+                        if(label) label.innerText = `(${i + 1} / ${matchIds.length})`;
+                    } catch (e) {
+                        console.warn(`Failed to fetch match ${matchIds[i]}`, e);
+                        // Continue loop even if one match fails
+                    }
+                }
+                updateStepUI('step-matches', 'success');
+                
+                const soloRank = leagueData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
+                
+                currentData = {
+                    account: accountData,
+                    tier: soloRank ? soloRank.tier : "UNRANKED",
+                    rank: soloRank ? soloRank.rank : "",
+                    lp: soloRank ? soloRank.leaguePoints : 0,
+                    wins: wins,
+                    losses: losses,
+                    history: history.slice(0, 10),
+                    totalWins: soloRank ? soloRank.wins : 0,
+                    totalLosses: soloRank ? soloRank.losses : 0
+                };
+
+                displayFinalResults();
+                if (!document.getElementById('floatingPopup').classList.contains('hidden')) {
+                    renderPopupContent();
+                }
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function fetchWithRetry(url) {
+            // Remove protocol and use local proxy path
+            const path = url.replace(/^https?:\/\//, '');
+            const proxiedUrl = `/api/riot/${path}`;
+
+            try {
+                const response = await fetch(proxiedUrl);
+                
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => ({}));
+                    if (response.status === 429) throw new Error("Rate limit exceeded. Please wait a moment.");
+                    if (response.status === 403) throw new Error("API Key Invalid (Server Check Required).");
+                    if (response.status === 404) throw new Error("Data Not Found (404).");
+                    throw new Error(errorBody.error || `HTTP Error ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                throw err;
+            }
+        }
+
+        function updateStepUI(id, state) {
+            const el = document.getElementById(id);
+            const icon = el.querySelector('.status-icon');
+            if (state === 'loading') { 
+                el.classList.add('text-blue-400'); 
+                el.classList.remove('text-green-400');
+                icon.classList.add('loading-dots'); 
+                icon.innerText = "";
+            }
+            else if (state === 'success') { 
+                el.classList.remove('text-blue-400');
+                el.classList.add('text-green-400'); 
+                icon.innerText = "✓"; 
+                icon.classList.remove('loading-dots'); 
+            }
+        }
+
+        function resetSteps() {
+            ['step-account', 'step-league', 'step-matches'].forEach((id, i) => {
+                const el = document.getElementById(id);
+                el.className = "flex items-center gap-3 text-gray-500";
+                const icon = el.querySelector('.status-icon');
+                icon.innerText = i + 1;
+                icon.className = "w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50";
+            });
+            document.getElementById('matchCountLabel').innerText = '';
+        }
+
+        function displayFinalResults() {
+            const data = currentData;
+            document.getElementById('resultArea').classList.remove('hidden');
+            document.getElementById('fetchProgress').classList.add('hidden');
+            
+            document.getElementById('displayName').innerText = `${data.account.gameName} #${data.account.tagLine}`;
+            document.getElementById('winCount').innerText = data.wins;
+            document.getElementById('lossCount').innerText = data.losses;
+            const color = getTierColor(data.tier);
+            document.getElementById('rankText').innerText = `${data.tier} ${data.rank}`;
+            document.getElementById('rankText').style.color = color;
+            document.getElementById('lpValue').innerText = `${data.lp} LP`;
+            
+            const iconContainer = document.getElementById('rankIconContainer');
+            if (data.tier === "UNRANKED") {
+                iconContainer.classList.add('hidden');
+            } else {
+                iconContainer.classList.remove('hidden');
+                let imgName = (data.tier === "IRON") ? "Iron.png" : `${data.tier.toLowerCase()}.png`;
+                document.getElementById('rankIcon').src = `png/${imgName}`;
+            }
+            
+            document.getElementById('totalWinCount').innerText = data.totalWins;
+            document.getElementById('totalLossCount').innerText = data.totalLosses;
+            const total = data.totalWins + data.totalLosses;
+            document.getElementById('totalWinRatio').innerText = total > 0 ? Math.round((data.totalWins / total) * 100) + '%' : '0%';
+            
+            const now = new Date();
+            document.getElementById('lastUpdatedLabel').innerText = `Last Updated: ${now.toLocaleTimeString()}`;
+        }
+
+        function getTierColor(tier) {
+            const colors = { 'IRON': '#a19d94', 'BRONZE': '#cd7f32', 'SILVER': '#c0c0c0', 'GOLD': '#ffd700', 'PLATINUM': '#2596be', 'EMERALD': '#10b981', 'DIAMOND': '#b9f2ff', 'MASTER': '#d400ff', 'GRANDMASTER': '#ff4500', 'CHALLENGER': '#f0e68c' };
+            return colors[tier] || '#ffffff';
+        }
+
+        function showError(msg) {
+            document.getElementById('errorText').innerText = msg;
+            document.getElementById('errorMsg').classList.remove('hidden');
+            document.getElementById('fetchProgress').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

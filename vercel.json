@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/riot/(.*)",
+      "destination": "/api/proxy.js"
+    }
+  ]
+}
