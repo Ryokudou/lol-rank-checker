@@ -75,16 +75,41 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0; /* gapを削除して個別にpadding制御 */
             padding-right: 0.5rem;
+            padding-left: 0.25rem;
         }
         .history-chip:hover {
             background: rgba(59, 130, 246, 0.2);
             border-color: rgba(59, 130, 246, 0.4);
         }
+        
+        /* お気に入りボタンのスタイル */
+        .favorite-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.2);
+            transition: all 0.2s;
+        }
+        .favorite-btn:hover {
+            color: #fbbf24; /* amber-400 */
+            transform: scale(1.1);
+        }
+        .favorite-btn.active {
+            color: #fbbf24;
+        }
+        .favorite-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
         .history-content {
             cursor: pointer;
-            padding: 0.25rem 0 0.25rem 0.75rem;
+            padding: 0.25rem 0.5rem 0.25rem 0.25rem;
             display: flex;
             align-items: center;
             gap: 0.25rem;
@@ -189,7 +214,7 @@
         .layout-normal .cq-stat-label { font-size: 12cqh; margin-bottom: 0.5cqh; font-weight: bold; line-height: 1; }
         .layout-normal .cq-stat-value { font-size: 9cqh; font-weight: 800; line-height: 1; color: white; }
 
-        /* LIVEモードのレイアウト（修正後） */
+        /* LIVEモードのレイアウト */
         .layout-live {
             display: flex; flex-direction: row; align-items: center;
             padding: 0 12px; background: transparent; gap: 15px;
@@ -575,11 +600,77 @@
 
         function saveToHistory(name, tag, region) {
             let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
-            history = history.filter(item => !(item.name.toLowerCase() === name.toLowerCase() && item.tag.toLowerCase() === tag.toLowerCase()));
-            history.unshift({ name, tag, region });
-            if (history.length > MAX_HISTORY) history.pop();
+            
+            // 既存のエントリを探して削除（お気に入り状態を保存）
+            const existingIndex = history.findIndex(item => 
+                item.name.toLowerCase() === name.toLowerCase() && 
+                item.tag.toLowerCase() === tag.toLowerCase()
+            );
+            
+            let isFavorite = false;
+            if (existingIndex !== -1) {
+                isFavorite = history[existingIndex].isFavorite || false;
+                history.splice(existingIndex, 1);
+            }
+
+            const newItem = { name, tag, region, isFavorite };
+
+            // お気に入りとお気に入りじゃないものに分ける
+            const favorites = history.filter(item => item.isFavorite);
+            const regulars = history.filter(item => !item.isFavorite);
+
+            // どちらかのグループの先頭に追加（新しい検索結果なので上位へ）
+            if (isFavorite) {
+                favorites.unshift(newItem);
+            } else {
+                regulars.unshift(newItem);
+            }
+
+            // 通常履歴のみ件数制限をかける（お気に入りは保持し続ける）
+            if (regulars.length > MAX_HISTORY) {
+                regulars = regulars.slice(0, MAX_HISTORY);
+            }
+
+            // 結合して保存（お気に入りが常に前）
+            history = [...favorites, ...regulars];
             localStorage.setItem('lol_search_history', JSON.stringify(history));
             renderHistory();
+        }
+
+        function toggleFavorite(name, tag, event) {
+            if (event) event.stopPropagation();
+            let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
+            const index = history.findIndex(item => 
+                item.name === name && item.tag === tag
+            );
+
+            if (index !== -1) {
+                // フラグ反転
+                history[index].isFavorite = !history[index].isFavorite;
+                
+                // 再整理のために saveToHistory のロジック的な並び替えを行う
+                // ここでは簡易的に、現在のアイテムを取り出して再結合ロジックを通す
+                const item = history[index];
+                history.splice(index, 1);
+                
+                const favorites = history.filter(i => i.isFavorite);
+                const regulars = history.filter(i => !i.isFavorite);
+                
+                if (item.isFavorite) {
+                    favorites.unshift(item); // お気に入りになったらお気に入りグループの先頭へ
+                } else {
+                    regulars.unshift(item); // お気に入りが外れたら通常グループの先頭へ
+                }
+                
+                // 通常履歴の制限チェック（お気に入りから戻ってあふれた場合用）
+                if (regulars.length > MAX_HISTORY) {
+                    regulars = regulars.slice(0, MAX_HISTORY);
+                }
+                
+                history = [...favorites, ...regulars];
+                localStorage.setItem('lol_search_history', JSON.stringify(history));
+                renderHistory();
+            }
         }
 
         function removeFromHistory(name, tag, event) {
@@ -610,8 +701,17 @@
                 const nameEsc = item.name.replace(/'/g, "\\'");
                 const tagEsc = item.tag.replace(/'/g, "\\'");
                 const regionEsc = item.region;
-                
+                const isFav = item.isFavorite;
+
+                // SVG: Outline (Empty) or Solid (Filled)
+                const starSvg = isFav 
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd" /></svg>`
+                    : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>`;
+
                 chip.innerHTML = `
+                    <div class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${nameEsc}', '${tagEsc}', event)">
+                        ${starSvg}
+                    </div>
                     <div class="history-content" onclick="applyHistory('${nameEsc}', '${tagEsc}', '${regionEsc}')">
                         <span>${item.name}</span>
                         <span class="text-gray-500">#${item.tag}</span>
@@ -940,6 +1040,48 @@
             document.getElementById('errorMsg').classList.remove('hidden');
             document.getElementById('fetchProgress').classList.add('hidden');
         }
+
+        /**
+         * API Rate Limiter Injection
+         * Enforces a maximum of 115 requests per minute to comply with API limits.
+         */
+        (function() {
+            const originalFetch = window.fetchWithRetry;
+            const RATE_LIMIT = 115;
+            const TIME_WINDOW = 60000; // 1 minute
+            const requestTimestamps = [];
+
+            // Override the existing fetchWithRetry function
+            window.fetchWithRetry = async function(url) {
+                const now = Date.now();
+                
+                // Clear timestamps older than the time window
+                while (requestTimestamps.length > 0 && requestTimestamps[0] <= now - TIME_WINDOW) {
+                    requestTimestamps.shift();
+                }
+
+                // Check if rate limit is reached
+                if (requestTimestamps.length >= RATE_LIMIT) {
+                    const oldestTimestamp = requestTimestamps[0];
+                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100; // Add small buffer
+                    
+                    if (waitTime > 0) {
+                        console.log(`[Rate Limiter] Limit reached. Waiting ${waitTime}ms before next request...`);
+                        await new Promise(resolve => setTimeout(resolve, waitTime));
+                        // Retry the call after waiting
+                        return window.fetchWithRetry(url);
+                    }
+                }
+
+                // Log the request timestamp
+                requestTimestamps.push(Date.now());
+
+                // Execute the original function
+                return originalFetch(url);
+            };
+            
+            console.log("API Rate Limiter initialized: Max 115 req/min");
+        })();
     </script>
 </body>
 </html>
