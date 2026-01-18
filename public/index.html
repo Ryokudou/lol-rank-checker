@@ -6,10 +6,10 @@
     <title>LoL Rank Checker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
         
         body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            font-family: 'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif;
             background-color: #0f172a;
             background-image: 
                 radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
@@ -439,7 +439,7 @@
                     </div>
                 </div>
                 <footer class="mt-auto py-6 text-center text-[10px] text-gray-600">
-                    <p>Data provided by Riot Games API via Vercel Serverless Proxy.</p>
+                    <p data-i18n="footerText">Data provided by Riot Games API via Vercel Serverless Proxy.</p>
                 </footer>
             </main>
         </div>
@@ -452,7 +452,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
-                <span class="text-[10px] font-bold text-gray-300 tracking-wider">RANK MONITOR</span>
+                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
             </div>
             <div class="flex items-center gap-2">
                 <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
@@ -464,7 +464,7 @@
             </div>
         </div>
         <div id="popupBody">
-            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
                 No Data.
             </div>
         </div>
@@ -484,11 +484,11 @@
             ja: {
                 appTitle: "LoLランクチェッカー",
                 appSubtitle: "サモナー戦績分析",
-                lblGameName: "サモナー名 (Game Name)",
-                lblTagLine: "タグ (#なし)",
+                lblGameName: "サモナー名",
+                lblTagLine: "タグライン",
                 phGameName: "サモナー名",
                 phTagLine: "#タグ",
-                lblRegion: "サーバー (Region)",
+                lblRegion: "サーバー",
                 lblHistory: "最近の検索",
                 lblAutoRefresh: "自動更新 (20分毎)",
                 btnSearch: "戦績を取得する",
@@ -501,7 +501,21 @@
                 lblWins: "勝利",
                 lblLosses: "敗北",
                 lblWinRate: "勝率",
-                lblSeasonTotal: "今シーズンの通算成績"
+                lblSeasonTotal: "今シーズンの通算成績",
+                alertServerRequired: "【重要】\nこのアプリはAPIプロキシを使用するため、Webサーバー上で動作させる必要があります。\nVercel等にデプロイするか、ローカルサーバー(localhost)経由で開いてください。\n直接HTMLファイルを開くとAPI通信が動作しません。",
+                popupTitle: "ランクモニター",
+                liveModeOn: "ライブモード: ON",
+                liveModeOff: "ライブモード: OFF",
+                noData: "データなし",
+                footerText: "Data provided by Riot Games API via Vercel Serverless Proxy.",
+                errRateLimit: "レート制限を超えました。しばらくお待ちください。",
+                errApiKey: "APIキーが無効です。",
+                errNotFound: "データが見つかりません (404)。",
+                alertFetchFirst: "先に戦績を取得してください。",
+                regJp: "日本 (JP)",
+                regNa: "北米 (NA)",
+                regEuw: "西欧 (EUW)",
+                regKr: "韓国 (KR)"
             },
             en: {
                 appTitle: "LoL Rank Checker",
@@ -523,8 +537,101 @@
                 lblWins: "WINS",
                 lblLosses: "LOSSES",
                 lblWinRate: "WIN RATE",
-                lblSeasonTotal: "SEASON TOTAL"
+                lblSeasonTotal: "SEASON TOTAL",
+                alertServerRequired: "IMPORTANT:\nThis app uses an API proxy and must be run on a web server.\nPlease deploy to Vercel or open via localhost.\nAPI calls will not work if you open the HTML file directly.",
+                popupTitle: "RANK MONITOR",
+                liveModeOn: "LIVE MODE: ON",
+                liveModeOff: "LIVE MODE: OFF",
+                noData: "No Data.",
+                footerText: "Data provided by Riot Games API via Vercel Serverless Proxy.",
+                errRateLimit: "Rate limit exceeded. Please wait a moment.",
+                errApiKey: "API Key Invalid (Server Check Required).",
+                errNotFound: "Data Not Found (404).",
+                alertFetchFirst: "Please fetch stats first.",
+                regJp: "Japan (JP)",
+                regNa: "North America (NA)",
+                regEuw: "Europe West (EUW)",
+                regKr: "Korea (KR)"
+            },
+            ko: {
+                appTitle: "LoL 랭크 체커",
+                appSubtitle: "소환사 전적 분석",
+                lblGameName: "소환사 이름",
+                lblTagLine: "태그",
+                phGameName: "소환사 이름",
+                phTagLine: "#태그",
+                lblRegion: "지역",
+                lblHistory: "최근 검색",
+                lblAutoRefresh: "자동 갱신 (20분)",
+                btnSearch: "전적 검색",
+                btnPopup: "팝업 열기",
+                progressTitle: "데이터 분석 중...",
+                stepIdentity: "계정 확인 (PUUID)",
+                stepRank: "랭크 및 LP 확인",
+                stepMatches: "최근 20경기 스캔",
+                lblRecentResults: "최근 20경기 결과",
+                lblWins: "승리",
+                lblLosses: "패배",
+                lblWinRate: "승률",
+                lblSeasonTotal: "시즌 전체 성적",
+                alertServerRequired: "【중요】\n이 앱은 API 프록시를 사용하므로 웹 서버에서 실행해야 합니다.\nVercel 등에 배포하거나 로컬 서버(localhost)를 통해 여세요.\nHTML 파일을 직접 열면 API 통신이 작동하지 않습니다.",
+                popupTitle: "랭크 모니터",
+                liveModeOn: "라이브 모드: ON",
+                liveModeOff: "라이브 모드: OFF",
+                noData: "데이터 없음",
+                footerText: "Data provided by Riot Games API via Vercel Serverless Proxy.",
+                errRateLimit: "요청 제한 초과. 잠시 기다려주세요.",
+                errApiKey: "API 키가 유효하지 않습니다.",
+                errNotFound: "데이터를 찾을 수 없습니다 (404).",
+                alertFetchFirst: "먼저 전적을 검색해주세요.",
+                regJp: "일본 (JP)",
+                regNa: "북미 (NA)",
+                regEuw: "서유럽 (EUW)",
+                regKr: "한국 (KR)"
+            },
+            zh: {
+                appTitle: "LoL 段位查询器",
+                appSubtitle: "召唤师数据分析",
+                lblGameName: "游戏名称",
+                lblTagLine: "标签",
+                phGameName: "游戏名称",
+                phTagLine: "#标签",
+                lblRegion: "服务器",
+                lblHistory: "最近搜索",
+                lblAutoRefresh: "自动刷新 (20分钟)",
+                btnSearch: "查询战绩",
+                btnPopup: "悬浮窗显示",
+                progressTitle: "正在分析数据...",
+                stepIdentity: "验证身份 (PUUID)",
+                stepRank: "获取段位与胜点",
+                stepMatches: "扫描最近20场排位",
+                lblRecentResults: "最近20场战绩",
+                lblWins: "胜",
+                lblLosses: "负",
+                lblWinRate: "胜率",
+                lblSeasonTotal: "本赛季总成绩",
+                alertServerRequired: "【重要】\n本应用使用API代理，必须在Web服务器上运行。\n请部署到Vercel或通过本地服务器(localhost)打开。\n直接打开HTML文件将导致API通信无法工作。",
+                popupTitle: "段位监控",
+                liveModeOn: "实时模式: 开",
+                liveModeOff: "实时模式: 关",
+                noData: "暂无数据",
+                footerText: "Data provided by Riot Games API via Vercel Serverless Proxy.",
+                errRateLimit: "请求过于频繁，请稍候。",
+                errApiKey: "API密钥无效。",
+                errNotFound: "未找到数据 (404)。",
+                alertFetchFirst: "请先查询战绩。",
+                regJp: "日本 (JP)",
+                regNa: "北美 (NA)",
+                regEuw: "西欧 (EUW)",
+                regKr: "韩国 (KR)"
             }
+        };
+
+        const regionNames = {
+            'jp1': 'regJp',
+            'na1': 'regNa',
+            'euw1': 'regEuw',
+            'kr': 'regKr'
         };
 
         function adjustAppScale() {
@@ -543,13 +650,19 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.protocol === 'file:') {
-                alert("【重要】\nこのアプリはAPIプロキシを使用するため、Webサーバー上で動作させる必要があります。\nVercel等にデプロイするか、ローカルサーバー(localhost)経由で開いてください。\n直接HTMLファイルを開くとAPI通信が動作しません。");
+                alert(t('alertServerRequired'));
             }
             renderHistory();
             changeLanguage();
             initDraggable();
             adjustAppScale();
         });
+
+        function t(key) {
+            const lang = document.getElementById('langSelect').value;
+            const texts = i18n[lang] || i18n['en'];
+            return texts[key] || key;
+        }
 
         function initDraggable() {
             const popup = document.getElementById("floatingPopup");
@@ -586,6 +699,7 @@
         function changeLanguage() {
             const lang = document.getElementById('langSelect').value;
             const texts = i18n[lang] || i18n['en'];
+            document.documentElement.lang = lang;
             
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
@@ -596,12 +710,22 @@
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (texts[key]) el.placeholder = texts[key];
             });
+
+            // Region Options
+            const regionSelect = document.getElementById('region');
+            Array.from(regionSelect.options).forEach(opt => {
+                const key = regionNames[opt.value];
+                if (key && texts[key]) {
+                    opt.text = texts[key];
+                }
+            });
+
+            updateModeBtn();
         }
 
         function saveToHistory(name, tag, region) {
             let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
             
-            // 既存のエントリを探して削除（お気に入り状態を保存）
             const existingIndex = history.findIndex(item => 
                 item.name.toLowerCase() === name.toLowerCase() && 
                 item.tag.toLowerCase() === tag.toLowerCase()
@@ -615,23 +739,19 @@
 
             const newItem = { name, tag, region, isFavorite };
 
-            // お気に入りとお気に入りじゃないものに分ける
             const favorites = history.filter(item => item.isFavorite);
             const regulars = history.filter(item => !item.isFavorite);
 
-            // どちらかのグループの先頭に追加（新しい検索結果なので上位へ）
             if (isFavorite) {
                 favorites.unshift(newItem);
             } else {
                 regulars.unshift(newItem);
             }
 
-            // 通常履歴のみ件数制限をかける（お気に入りは保持し続ける）
             if (regulars.length > MAX_HISTORY) {
                 regulars = regulars.slice(0, MAX_HISTORY);
             }
 
-            // 結合して保存（お気に入りが常に前）
             history = [...favorites, ...regulars];
             localStorage.setItem('lol_search_history', JSON.stringify(history));
             renderHistory();
@@ -645,11 +765,8 @@
             );
 
             if (index !== -1) {
-                // フラグ反転
                 history[index].isFavorite = !history[index].isFavorite;
                 
-                // 再整理のために saveToHistory のロジック的な並び替えを行う
-                // ここでは簡易的に、現在のアイテムを取り出して再結合ロジックを通す
                 const item = history[index];
                 history.splice(index, 1);
                 
@@ -657,12 +774,11 @@
                 const regulars = history.filter(i => !i.isFavorite);
                 
                 if (item.isFavorite) {
-                    favorites.unshift(item); // お気に入りになったらお気に入りグループの先頭へ
+                    favorites.unshift(item);
                 } else {
-                    regulars.unshift(item); // お気に入りが外れたら通常グループの先頭へ
+                    regulars.unshift(item);
                 }
                 
-                // 通常履歴の制限チェック（お気に入りから戻ってあふれた場合用）
                 if (regulars.length > MAX_HISTORY) {
                     regulars = regulars.slice(0, MAX_HISTORY);
                 }
@@ -703,7 +819,6 @@
                 const regionEsc = item.region;
                 const isFav = item.isFavorite;
 
-                // SVG: Outline (Empty) or Solid (Filled)
                 const starSvg = isFav 
                     ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd" /></svg>`
                     : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>`;
@@ -758,7 +873,7 @@
             const popup = document.getElementById('floatingPopup');
             if (popup.classList.contains('hidden')) {
                 if (!currentData) { 
-                    alert("Please fetch stats first."); 
+                    alert(t('alertFetchFirst')); 
                     return; 
                 }
                 isLiveMode = false;
@@ -792,10 +907,10 @@
         function updateModeBtn() {
             const btn = document.getElementById('modeToggleBtn');
             if (isLiveMode) {
-                btn.innerText = "LIVE MODE: ON";
+                btn.innerText = t('liveModeOn');
                 btn.classList.add('active-mode');
             } else {
-                btn.innerText = "LIVE MODE: OFF";
+                btn.innerText = t('liveModeOff');
                 btn.classList.remove('active-mode');
             }
         }
@@ -958,9 +1073,9 @@
                 
                 if (!response.ok) {
                     const errorBody = await response.json().catch(() => ({}));
-                    if (response.status === 429) throw new Error("Rate limit exceeded. Please wait a moment.");
-                    if (response.status === 403) throw new Error("API Key Invalid (Server Check Required).");
-                    if (response.status === 404) throw new Error("Data Not Found (404).");
+                    if (response.status === 429) throw new Error(t('errRateLimit'));
+                    if (response.status === 403) throw new Error(t('errApiKey'));
+                    if (response.status === 404) throw new Error(t('errNotFound'));
                     throw new Error(errorBody.error || `HTTP Error ${response.status}`);
                 }
                 
