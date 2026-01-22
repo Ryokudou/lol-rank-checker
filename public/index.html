@@ -75,7 +75,7 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0;
+            gap: 0; 
             padding-right: 0.5rem;
             padding-left: 0.25rem;
         }
@@ -95,7 +95,7 @@
             transition: all 0.2s;
         }
         .favorite-btn:hover {
-            color: #fbbf24;
+            color: #fbbf24; 
             transform: scale(1.1);
         }
         .favorite-btn.active {
@@ -149,6 +149,35 @@
             accent-color: #3b82f6;
             width: 16px;
             height: 16px;
+        }
+        
+        #floatingPopup {
+            resize: both;
+            overflow: hidden;
+            min-width: 150px;
+            min-height: 100px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            container-type: size;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #floatingPopup.hidden { display: none; }
+        
+        #popupHeader {
+            flex-shrink: 0; height: 32px; 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 8px; background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+        }
+
+        #popupBody {
+            flex-grow: 1; width: 100%; height: calc(100% - 32px);
+            position: relative; overflow: hidden;
         }
 
         .cq-container { width: 100%; height: 100%; }
@@ -415,6 +444,31 @@
         </div>
     </div>
 
+    <!-- Hidden Template for Popup Window -->
+    <div id="floatingPopup" class="hidden">
+        <div id="popupHeader">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
+                <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="popupBody">
+            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
+                No Data.
+            </div>
+        </div>
+    </div>
+
     <script>
         const MAX_HISTORY = 10;
         
@@ -582,6 +636,7 @@
 
         function adjustAppScale() {
             const wrapper = document.getElementById('app-scale-wrapper');
+            if (!wrapper) return;
             const baseWidth = 1280;
             const baseHeight = 800;
             const windowWidth = window.innerWidth;
@@ -614,15 +669,22 @@
             const texts = i18n[lang] || i18n['en'];
             document.documentElement.lang = lang;
             
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (texts[key]) el.innerText = texts[key];
-            });
+            const updateTexts = (doc) => {
+                doc.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (texts[key]) el.innerText = texts[key];
+                });
 
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (texts[key]) el.placeholder = texts[key];
-            });
+                doc.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    if (texts[key]) el.placeholder = texts[key];
+                });
+            };
+
+            updateTexts(document);
+            if (popupWindow && !popupWindow.closed && popupWindow.document) {
+                updateTexts(popupWindow.document);
+            }
 
             // Region Options
             const regionSelect = document.getElementById('region');
@@ -784,90 +846,84 @@
 
         function toggleFloatingPopup() {
             if (popupWindow && !popupWindow.closed) {
-                popupWindow.close();
-                popupWindow = null;
+                popupWindow.focus();
                 return;
             }
 
-            if (!currentData) {
-                alert(t('alertFetchFirst'));
-                return;
+            if (!currentData) { 
+                alert(t('alertFetchFirst')); 
+                return; 
             }
 
             const width = isLiveMode ? 620 : 400;
-            const height = isLiveMode ? 140 : 320;
+            const height = isLiveMode ? 100 : 320;
             
             popupWindow = window.open('', 'RankMonitor', `width=${width},height=${height},resizable=yes`);
-            
             if (!popupWindow) {
-                alert("Popup blocked! Please allow popups for this site.");
+                alert("Popup blocked. Please allow popups for this site.");
                 return;
             }
 
-            const baseHref = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-            const styles = document.querySelector('style').innerHTML;
-
+            const content = document.getElementById('floatingPopup').innerHTML;
+            
             popupWindow.document.write(`
                 <!DOCTYPE html>
-                <html>
+                <html lang="${document.documentElement.lang}">
                 <head>
-                    <base href="${baseHref}">
-                    <title>Rank Monitor</title>
-                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <meta charset="UTF-8">
+                    <title>${t('popupTitle')}</title>
+                    ${document.head.innerHTML}
                     <style>
-                        ${styles}
-                        body {
-                            margin: 0;
-                            padding: 0;
-                            width: 100vw;
-                            height: 100vh;
-                            overflow: hidden;
-                            background-color: #0f172a;
-                            display: flex;
-                            flex-direction: column;
-                            container-type: size;
+                        body { 
+                            margin: 0; padding: 0; width: 100%; height: 100%; 
+                            overflow: hidden; background-color: #0f172a; 
+                            display: flex; flex-direction: column;
+                            align-items: stretch; justify-content: stretch;
                         }
-                        #popupControl {
-                            position: absolute;
-                            top: 0;
-                            right: 0;
-                            z-index: 50;
-                            padding: 4px;
-                            opacity: 0;
-                            transition: opacity 0.2s;
+                        #floatingPopup { 
+                            display: flex !important; 
+                            position: relative !important; 
+                            top: 0 !important; left: 0 !important; 
+                            transform: none !important; 
+                            width: 100% !important; height: 100% !important;
+                            box-shadow: none !important;
+                            border: none !important;
+                            border-radius: 0 !important;
                         }
-                        body:hover #popupControl {
-                            opacity: 1;
-                        }
-                        .cq-container {
-                            width: 100%;
-                            height: 100%;
-                        }
+                        #popupHeader { cursor: default !important; }
                     </style>
                 </head>
                 <body>
-                    <div id="popupControl">
-                        <button id="popModeBtn" class="btn-live-toggle shadow-lg border border-white/20">Mode</button>
+                    <div id="floatingPopup" class="glass-panel">
+                        ${content}
                     </div>
-                    <div id="popupBody" class="w-full h-full"></div>
+                    <script>
+                        window.opener = window.opener;
+                        function togglePopupMode() {
+                            if(window.opener) window.opener.togglePopupMode();
+                        }
+                        function closeFloatingPopup() {
+                            window.close();
+                        }
+                    <\/script>
                 </body>
                 </html>
             `);
             popupWindow.document.close();
-
-            setTimeout(() => {
-                renderPopupContent();
-                const btn = popupWindow.document.getElementById('popModeBtn');
-                if(btn) {
-                    btn.onclick = () => window.togglePopupMode();
-                    btn.innerText = isLiveMode ? t('liveModeOn') : t('liveModeOff');
-                    if(isLiveMode) btn.classList.add('active-mode');
-                }
-            }, 100);
-
-            popupWindow.onbeforeunload = () => {
+            
+            updateModeBtn();
+            renderPopupContent();
+            
+            popupWindow.onbeforeunload = function() {
                 popupWindow = null;
             };
+        }
+
+        function closeFloatingPopup() {
+            if (popupWindow && !popupWindow.closed) {
+                popupWindow.close();
+            }
+            popupWindow = null;
         }
 
         function togglePopupMode() {
@@ -876,27 +932,40 @@
             
             if (popupWindow && !popupWindow.closed) {
                 const width = isLiveMode ? 620 : 400;
-                const height = isLiveMode ? 140 : 320;
-                popupWindow.resizeTo(width, height);
-
-                const btn = popupWindow.document.getElementById('popModeBtn');
-                if (btn) {
-                    btn.innerText = isLiveMode ? t('liveModeOn') : t('liveModeOff');
-                    if (isLiveMode) btn.classList.add('active-mode');
-                    else btn.classList.remove('active-mode');
-                }
-                
+                const height = isLiveMode ? 100 : 320;
+                try {
+                    popupWindow.resizeTo(width + (popupWindow.outerWidth - popupWindow.innerWidth), height + (popupWindow.outerHeight - popupWindow.innerHeight));
+                } catch(e) { /* ignore if blocked */ }
                 renderPopupContent();
             }
         }
 
         function updateModeBtn() {
-            // Main window UI update if needed (currently popup button handles mode logic internally mostly)
+            const btnText = isLiveMode ? t('liveModeOn') : t('liveModeOff');
+            
+            const updateBtn = (doc) => {
+                const btn = doc.getElementById('modeToggleBtn');
+                if (btn) {
+                    btn.innerText = btnText;
+                    if (isLiveMode) btn.classList.add('active-mode');
+                    else btn.classList.remove('active-mode');
+                }
+            };
+
+            updateBtn(document);
+            if (popupWindow && !popupWindow.closed && popupWindow.document) {
+                updateBtn(popupWindow.document);
+            }
         }
 
         function renderPopupContent() {
-            if (!currentData || !popupWindow || popupWindow.closed) return;
-            const container = popupWindow.document.getElementById('popupBody');
+            if (!currentData) return;
+            
+            let container = null;
+            if (popupWindow && !popupWindow.closed && popupWindow.document) {
+                container = popupWindow.document.getElementById('popupContentContainer');
+            }
+            
             if (!container) return;
 
             const { tier, rank, lp, wins, losses, history } = currentData;
@@ -1011,7 +1080,6 @@
                                 else { losses++; history.push(false); }
                             }
                         }
-                        // Progress update
                         const label = document.getElementById('matchCountLabel');
                         if(label) label.innerText = `(${i + 1} / ${matchIds.length})`;
                     } catch (e) {
@@ -1035,7 +1103,9 @@
                 };
 
                 displayFinalResults();
-                renderPopupContent();
+                if (popupWindow && !popupWindow.closed) {
+                    renderPopupContent();
+                }
             } catch (err) {
                 showError(err.message);
             }
@@ -1136,11 +1206,12 @@
         (function() {
             const originalFetch = window.fetchWithRetry;
             const RATE_LIMIT = 115;
-            const TIME_WINDOW = 60000;
+            const TIME_WINDOW = 60000; 
             const requestTimestamps = [];
 
             window.fetchWithRetry = async function(url) {
                 const now = Date.now();
+                
                 while (requestTimestamps.length > 0 && requestTimestamps[0] <= now - TIME_WINDOW) {
                     requestTimestamps.shift();
                 }
@@ -1157,6 +1228,7 @@
                 }
 
                 requestTimestamps.push(Date.now());
+
                 return originalFetch(url);
             };
             
