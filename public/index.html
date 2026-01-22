@@ -25,6 +25,41 @@
             align-items: center;
         }
 
+        /* ポップアップウィンドウモード用スタイル */
+        body.popup-window-mode {
+            background: #0f172a; /* ウィンドウキャプチャ用に背景色を確保 */
+            background-image: none;
+        }
+        
+        body.popup-window-mode #app-scale-wrapper {
+            display: none !important;
+        }
+
+        body.popup-window-mode #floatingPopup {
+            display: flex !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            transform: none !important;
+            border-radius: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            resize: none !important;
+            z-index: 9999;
+            min-width: 0 !important;
+            min-height: 0 !important;
+        }
+
+        body.popup-window-mode #popupHeader {
+            cursor: default; /* ドラッグ不可を示す */
+        }
+        
+        body.popup-window-mode .close-btn-icon {
+            /* OBS用には不要だが、ウィンドウを閉じるボタンとして機能させるため表示は維持 */
+        }
+
         #app-scale-wrapper {
             width: 1280px;  
             height: 800px; 
@@ -75,7 +110,7 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0; /* gapを削除して個別にpadding制御 */
+            gap: 0;
             padding-right: 0.5rem;
             padding-left: 0.25rem;
         }
@@ -84,7 +119,6 @@
             border-color: rgba(59, 130, 246, 0.4);
         }
         
-        /* お気に入りボタンのスタイル */
         .favorite-btn {
             display: flex;
             align-items: center;
@@ -96,7 +130,7 @@
             transition: all 0.2s;
         }
         .favorite-btn:hover {
-            color: #fbbf24; /* amber-400 */
+            color: #fbbf24;
             transform: scale(1.1);
         }
         .favorite-btn.active {
@@ -153,7 +187,7 @@
         }
         
         #floatingPopup {
-            resize: none;
+            resize: both;
             overflow: hidden;
             min-width: 150px;
             min-height: 100px;
@@ -169,7 +203,7 @@
         #floatingPopup.hidden { display: none; }
         
         #popupHeader {
-            flex-shrink: 0; height: 32px; cursor: default;
+            flex-shrink: 0; height: 32px; cursor: move;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 8px; background: rgba(0, 0, 0, 0.4);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -219,7 +253,7 @@
             display: flex; flex-direction: row; align-items: center;
             padding: 0 12px; background: transparent; gap: 15px;
             height: 100%; width: 100%; box-sizing: border-box;
-            justify-content: flex-start; /* 左寄せ */
+            justify-content: flex-start;
         }
         .layout-live .cq-rank-icon {
             height: 90cqh; width: auto; max-width: 25cqw;
@@ -229,7 +263,7 @@
         .layout-live .cq-content {
             display: flex; flex-direction: column; justify-content: center;
             align-items: flex-start; height: 100%; flex-grow: 1;
-            gap: 4cqh; /* 上下の行間 */
+            gap: 4cqh;
         }
         
         .layout-live .cq-rank-row {
@@ -344,7 +378,7 @@
                                     <button onclick="startSequentialFetch()" id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
                                         <span data-i18n="btnSearch">Fetch Stats</span>
                                     </button>
-                                    <div id="popupAnchor" class="flex items-center justify-between px-1">
+                                    <div class="flex items-center justify-between px-1">
                                         <label class="flex items-center gap-2 cursor-pointer group">
                                             <div class="relative flex items-center">
                                                 <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" class="peer sr-only">
@@ -443,29 +477,29 @@
                 </footer>
             </main>
         </div>
+    </div>
 
-        <!-- Draggable Popup (Fixed Position Mode) -->
-        <div id="floatingPopup" class="hidden absolute z-50 glass-panel rounded-xl" style="width: 600px; height: 480px;">
-            <div id="popupHeader">
-                <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                    <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
-                    <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
+    <!-- Draggable Popup (Shared with Popup Mode) -->
+    <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl" style="top: 100px; left: 50%; transform: translateX(-50%); width: 600px; height: 480px;">
+        <div id="popupHeader">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
             </div>
-            <div id="popupBody">
-                <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
-                    No Data.
-                </div>
+            <div class="flex items-center gap-2">
+                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
+                <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1 popup-close-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 close-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="popupBody">
+            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
+                No Data.
             </div>
         </div>
     </div>
@@ -479,6 +513,18 @@
 
         let currentData = null;
         let isLiveMode = false;
+
+        // URLパラメータでポップアップモード判定
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPopupWindow = urlParams.get('mode') === 'popup';
+        // データ同期用のチャネル
+        const broadcastChannel = new BroadcastChannel('lol_rank_monitor_channel');
+
+        if (isPopupWindow) {
+            document.body.classList.add('popup-window-mode');
+            // ポップアップモードなら初期状態で表示
+            document.getElementById('floatingPopup').classList.remove('hidden');
+        }
 
         const i18n = {
             ja: {
@@ -528,7 +574,7 @@
                 lblHistory: "Recent Searches",
                 lblAutoRefresh: "Auto Refresh (20m)",
                 btnSearch: "Fetch Stats",
-                btnPopup: "Show Popup",
+                btnPopup: "Open Popup Window",
                 progressTitle: "Analyzing Data...",
                 stepIdentity: "Verify Identity (PUUID)",
                 stepRank: "Check Rank Tier & LP",
@@ -635,6 +681,10 @@
         };
 
         function adjustAppScale() {
+            // ポップアップウィンドウモードではCSSのContainer Queriesが自動的にスケーリングを行うため、
+            // JSによる強制トランスフォームはメイン画面のみ適用する
+            if (isPopupWindow) return;
+
             const wrapper = document.getElementById('app-scale-wrapper');
             const baseWidth = 1280;
             const baseHeight = 800;
@@ -644,22 +694,59 @@
             const scaleY = windowHeight / baseHeight;
             const scale = Math.min(scaleX, scaleY); 
             wrapper.style.transform = `scale(${scale})`;
-            
-            updatePopupPosition();
         }
         
         window.addEventListener('resize', adjustAppScale);
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (window.location.protocol === 'file:') {
+            if (!isPopupWindow && window.location.protocol === 'file:') {
                 alert(t('alertServerRequired'));
             }
-            renderHistory();
-            changeLanguage();
-            // initDraggable(); // Removed as per instructions
-            adjustAppScale();
-            document.getElementById('app-scroll-container').addEventListener('scroll', updatePopupPosition);
+            
+            if (isPopupWindow) {
+                // ポップアップモード初期化
+                initPopupMode();
+            } else {
+                renderHistory();
+                changeLanguage();
+                initDraggable();
+                adjustAppScale();
+            }
         });
+        
+        function initPopupMode() {
+            // ローカルストレージから初期データ取得（初回表示のチラつき防止）
+            const syncedData = localStorage.getItem('lol_rank_sync_data');
+            if (syncedData) {
+                try {
+                    const parsed = JSON.parse(syncedData);
+                    currentData = parsed.data;
+                    isLiveMode = parsed.isLiveMode;
+                    const lang = parsed.lang || 'ja';
+                    document.getElementById('langSelect').value = lang;
+                    changeLanguage();
+                    renderPopupContent();
+                } catch(e) { console.error(e); }
+            }
+
+            // メインウィンドウからのデータ受信
+            broadcastChannel.onmessage = (event) => {
+                if (event.data.type === 'updateData') {
+                    currentData = event.data.payload;
+                    renderPopupContent();
+                } else if (event.data.type === 'changeMode') {
+                    isLiveMode = event.data.isLiveMode;
+                    updateModeBtn();
+                    renderPopupContent();
+                    // ウィンドウサイズも合わせたいところだが、セキュリティ制限で効かない場合が多い
+                    // 一応試みる
+                    try {
+                        if (isLiveMode) window.resizeTo(1566, 300);
+                        else window.resizeTo(616, 540);
+                    } catch(e) {}
+                }
+            };
+        }
 
         function t(key) {
             const lang = document.getElementById('langSelect').value;
@@ -667,29 +754,38 @@
             return texts[key] || key;
         }
 
-        // Draggable function removed to fix position
-
-        function updatePopupPosition() {
-            const popup = document.getElementById('floatingPopup');
-            if (popup.classList.contains('hidden')) return;
-
-            const anchor = document.getElementById('popupAnchor');
-            const wrapper = document.getElementById('app-scale-wrapper');
+        function initDraggable() {
+            if (isPopupWindow) return; // ポップアップウィンドウではドラッグ不要
             
-            if (anchor && wrapper) {
-                const anchorRect = anchor.getBoundingClientRect();
-                const wrapperRect = wrapper.getBoundingClientRect();
-                
-                // transform scale compensation
-                const scaleMatch = wrapper.style.transform.match(/scale\((.+)\)/);
-                const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
-                
-                const relTop = (anchorRect.bottom - wrapperRect.top) / scale;
-                const relLeft = (anchorRect.left - wrapperRect.left) / scale;
-                
-                popup.style.top = `${relTop + 10}px`;
-                popup.style.left = `${relLeft}px`;
-            }
+            const popup = document.getElementById("floatingPopup");
+            const header = document.getElementById("popupHeader");
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            header.addEventListener("mousedown", (e) => {
+                if (e.target.closest('button')) return;
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                const rect = popup.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+                popup.style.transform = 'none'; 
+                popup.style.left = `${initialLeft}px`;
+                popup.style.top = `${initialTop}px`;
+                document.body.style.userSelect = "none";
+            });
+
+            document.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                popup.style.left = `${initialLeft + (e.clientX - startX)}px`;
+                popup.style.top = `${initialTop + (e.clientY - startY)}px`;
+            });
+
+            document.addEventListener("mouseup", () => {
+                isDragging = false;
+                document.body.style.userSelect = "auto";
+            });
         }
 
         function changeLanguage() {
@@ -866,40 +962,75 @@
         }
 
         function toggleFloatingPopup() {
-            const popup = document.getElementById('floatingPopup');
-            if (popup.classList.contains('hidden')) {
-                if (!currentData) { 
-                    alert(t('alertFetchFirst')); 
-                    return; 
-                }
-                isLiveMode = false;
-                updateModeBtn();
-                renderPopupContent();
-                popup.classList.remove('hidden');
-                popup.style.width = '600px';
-                popup.style.height = '480px';
-                updatePopupPosition();
+            // OBSウィンドウキャプチャ対応のため、別ウィンドウで開くように変更
+            if (!currentData) { 
+                alert(t('alertFetchFirst')); 
+                return; 
             }
+
+            // サイズ調整: LIVEモード2.5倍、通常モード1.5倍
+            const width = isLiveMode ? 1550 : 600;
+            const height = isLiveMode ? 250 : 480;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            
+            // 現在のデータを同期用に保存
+            localStorage.setItem('lol_rank_sync_data', JSON.stringify({
+                data: currentData,
+                isLiveMode: isLiveMode,
+                lang: document.getElementById('langSelect').value
+            }));
+
+            // 新しいウィンドウを開く
+            window.open(
+                `${window.location.pathname}?mode=popup`, 
+                'RankMonitorPopup', 
+                `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no`
+            );
         }
 
         function closeFloatingPopup() {
-            document.getElementById('floatingPopup').classList.add('hidden');
+            if (isPopupWindow) {
+                window.close();
+            } else {
+                document.getElementById('floatingPopup').classList.add('hidden');
+            }
         }
 
         function togglePopupMode() {
             isLiveMode = !isLiveMode;
             updateModeBtn();
-            const popup = document.getElementById('floatingPopup');
             
-            if (isLiveMode) {
-                popup.style.width = '1550px';
-                popup.style.height = '250px';
+            // ポップアップウィンドウのサイズ変更はOS/ブラウザ制限があるため、
+            // ウィンドウ内のコンテンツ調整のみ行う（Container Queriesがサイズに追従する）
+            const popup = document.getElementById('floatingPopup');
+            if (!isPopupWindow) {
+                // 通常モード内のドラッグ可能ポップアップのサイズ調整
+                if (isLiveMode) {
+                    popup.style.width = '1550px';
+                    popup.style.height = '250px';
+                } else {
+                    popup.style.width = '600px';
+                    popup.style.height = '480px';
+                }
             } else {
-                popup.style.width = '600px';
-                popup.style.height = '480px';
+                // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
+                try {
+                    // 枠分を適当に考慮
+                    if (isLiveMode) window.resizeTo(1566, 300);
+                    else window.resizeTo(616, 540);
+                } catch(e) {
+                    console.log('Window resize blocked by browser');
+                }
             }
+            
             renderPopupContent();
-            updatePopupPosition();
+
+            // モード変更を他方のウィンドウに通知
+            broadcastChannel.postMessage({
+                type: 'changeMode',
+                isLiveMode: isLiveMode
+            });
         }
 
         function updateModeBtn() {
@@ -1028,12 +1159,10 @@
                                 else { losses++; history.push(false); }
                             }
                         }
-                        // Progress update
                         const label = document.getElementById('matchCountLabel');
                         if(label) label.innerText = `(${i + 1} / ${matchIds.length})`;
                     } catch (e) {
                         console.warn(`Failed to fetch match ${matchIds[i]}`, e);
-                        // Continue loop even if one match fails
                     }
                 }
                 updateStepUI('step-matches', 'success');
@@ -1053,7 +1182,15 @@
                 };
 
                 displayFinalResults();
-                if (!document.getElementById('floatingPopup').classList.contains('hidden')) {
+                
+                // データ更新をポップアップに通知
+                broadcastChannel.postMessage({
+                    type: 'updateData',
+                    payload: currentData
+                });
+
+                // 通常モードでポップアップが既に表示されている場合（古い挙動の名残だが、一応更新）
+                if (!document.getElementById('floatingPopup').classList.contains('hidden') && !isPopupWindow) {
                     renderPopupContent();
                 }
             } catch (err) {
@@ -1062,7 +1199,6 @@
         }
 
         async function fetchWithRetry(url) {
-            // Remove protocol and use local proxy path
             const path = url.replace(/^https?:\/\//, '');
             const proxiedUrl = `/api/riot/${path}`;
 
@@ -1154,42 +1290,30 @@
             document.getElementById('fetchProgress').classList.add('hidden');
         }
 
-        /**
-         * API Rate Limiter Injection
-         * Enforces a maximum of 115 requests per minute to comply with API limits.
-         */
         (function() {
             const originalFetch = window.fetchWithRetry;
             const RATE_LIMIT = 115;
-            const TIME_WINDOW = 60000; // 1 minute
+            const TIME_WINDOW = 60000;
             const requestTimestamps = [];
 
-            // Override the existing fetchWithRetry function
             window.fetchWithRetry = async function(url) {
                 const now = Date.now();
-                
-                // Clear timestamps older than the time window
                 while (requestTimestamps.length > 0 && requestTimestamps[0] <= now - TIME_WINDOW) {
                     requestTimestamps.shift();
                 }
 
-                // Check if rate limit is reached
                 if (requestTimestamps.length >= RATE_LIMIT) {
                     const oldestTimestamp = requestTimestamps[0];
-                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100; // Add small buffer
+                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100;
                     
                     if (waitTime > 0) {
                         console.log(`[Rate Limiter] Limit reached. Waiting ${waitTime}ms before next request...`);
                         await new Promise(resolve => setTimeout(resolve, waitTime));
-                        // Retry the call after waiting
                         return window.fetchWithRetry(url);
                     }
                 }
 
-                // Log the request timestamp
                 requestTimestamps.push(Date.now());
-
-                // Execute the original function
                 return originalFetch(url);
             };
             
