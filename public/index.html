@@ -445,7 +445,7 @@
         </div>
 
         <!-- Draggable Popup (Fixed Position Mode) -->
-        <div id="floatingPopup" class="hidden absolute z-50 glass-panel rounded-xl" style="width: 400px; height: 320px;">
+        <div id="floatingPopup" class="hidden absolute z-50 glass-panel rounded-xl" style="width: 600px; height: 480px;">
             <div id="popupHeader">
                 <div class="flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -876,8 +876,8 @@
                 updateModeBtn();
                 renderPopupContent();
                 popup.classList.remove('hidden');
-                popup.style.width = '400px';
-                popup.style.height = '320px';
+                popup.style.width = '600px';
+                popup.style.height = '480px';
                 updatePopupPosition();
             }
         }
@@ -892,11 +892,11 @@
             const popup = document.getElementById('floatingPopup');
             
             if (isLiveMode) {
-                popup.style.width = '620px';
-                popup.style.height = '100px';
+                popup.style.width = '1550px';
+                popup.style.height = '250px';
             } else {
-                popup.style.width = '400px';
-                popup.style.height = '320px';
+                popup.style.width = '600px';
+                popup.style.height = '480px';
             }
             renderPopupContent();
             updatePopupPosition();
