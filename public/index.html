@@ -75,7 +75,7 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0; 
+            gap: 0; /* gapを削除して個別にpadding制御 */
             padding-right: 0.5rem;
             padding-left: 0.25rem;
         }
@@ -84,6 +84,7 @@
             border-color: rgba(59, 130, 246, 0.4);
         }
         
+        /* お気に入りボタンのスタイル */
         .favorite-btn {
             display: flex;
             align-items: center;
@@ -95,7 +96,7 @@
             transition: all 0.2s;
         }
         .favorite-btn:hover {
-            color: #fbbf24;
+            color: #fbbf24; /* amber-400 */
             transform: scale(1.1);
         }
         .favorite-btn.active {
@@ -151,6 +152,35 @@
             height: 16px;
         }
         
+        #floatingPopup {
+            resize: none;
+            overflow: hidden;
+            min-width: 150px;
+            min-height: 100px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            container-type: size;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #floatingPopup.hidden { display: none; }
+        
+        #popupHeader {
+            flex-shrink: 0; height: 32px; cursor: default;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 8px; background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+        }
+
+        #popupBody {
+            flex-grow: 1; width: 100%; height: calc(100% - 32px);
+            position: relative; overflow: hidden;
+        }
+
         .cq-container { width: 100%; height: 100%; }
 
         /* 通常モードのレイアウト */
@@ -189,7 +219,7 @@
             display: flex; flex-direction: row; align-items: center;
             padding: 0 12px; background: transparent; gap: 15px;
             height: 100%; width: 100%; box-sizing: border-box;
-            justify-content: flex-start;
+            justify-content: flex-start; /* 左寄せ */
         }
         .layout-live .cq-rank-icon {
             height: 90cqh; width: auto; max-width: 25cqw;
@@ -199,7 +229,7 @@
         .layout-live .cq-content {
             display: flex; flex-direction: column; justify-content: center;
             align-items: flex-start; height: 100%; flex-grow: 1;
-            gap: 4cqh;
+            gap: 4cqh; /* 上下の行間 */
         }
         
         .layout-live .cq-rank-row {
@@ -314,7 +344,7 @@
                                     <button onclick="startSequentialFetch()" id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
                                         <span data-i18n="btnSearch">Fetch Stats</span>
                                     </button>
-                                    <div class="flex items-center justify-between px-1">
+                                    <div id="popupAnchor" class="flex items-center justify-between px-1">
                                         <label class="flex items-center gap-2 cursor-pointer group">
                                             <div class="relative flex items-center">
                                                 <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" class="peer sr-only">
@@ -413,6 +443,31 @@
                 </footer>
             </main>
         </div>
+
+        <!-- Draggable Popup (Fixed Position Mode) -->
+        <div id="floatingPopup" class="hidden absolute z-50 glass-panel rounded-xl" style="width: 400px; height: 320px;">
+            <div id="popupHeader">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
+                    <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="popupBody">
+                <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
+                    No Data.
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -424,7 +479,6 @@
 
         let currentData = null;
         let isLiveMode = false;
-        let popupWindow = null;
 
         const i18n = {
             ja: {
@@ -590,6 +644,8 @@
             const scaleY = windowHeight / baseHeight;
             const scale = Math.min(scaleX, scaleY); 
             wrapper.style.transform = `scale(${scale})`;
+            
+            updatePopupPosition();
         }
         
         window.addEventListener('resize', adjustAppScale);
@@ -600,13 +656,40 @@
             }
             renderHistory();
             changeLanguage();
+            // initDraggable(); // Removed as per instructions
             adjustAppScale();
+            document.getElementById('app-scroll-container').addEventListener('scroll', updatePopupPosition);
         });
 
         function t(key) {
             const lang = document.getElementById('langSelect').value;
             const texts = i18n[lang] || i18n['en'];
             return texts[key] || key;
+        }
+
+        // Draggable function removed to fix position
+
+        function updatePopupPosition() {
+            const popup = document.getElementById('floatingPopup');
+            if (popup.classList.contains('hidden')) return;
+
+            const anchor = document.getElementById('popupAnchor');
+            const wrapper = document.getElementById('app-scale-wrapper');
+            
+            if (anchor && wrapper) {
+                const anchorRect = anchor.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+                
+                // transform scale compensation
+                const scaleMatch = wrapper.style.transform.match(/scale\((.+)\)/);
+                const scale = scaleMatch ? parseFloat(scaleMatch[1]) : 1;
+                
+                const relTop = (anchorRect.bottom - wrapperRect.top) / scale;
+                const relLeft = (anchorRect.left - wrapperRect.left) / scale;
+                
+                popup.style.top = `${relTop + 10}px`;
+                popup.style.left = `${relLeft}px`;
+            }
         }
 
         function changeLanguage() {
@@ -624,6 +707,7 @@
                 if (texts[key]) el.placeholder = texts[key];
             });
 
+            // Region Options
             const regionSelect = document.getElementById('region');
             Array.from(regionSelect.options).forEach(opt => {
                 const key = regionNames[opt.value];
@@ -782,113 +866,56 @@
         }
 
         function toggleFloatingPopup() {
-            if (popupWindow && !popupWindow.closed) {
-                popupWindow.close();
-                popupWindow = null;
-            } else {
-                openPopupWindow();
+            const popup = document.getElementById('floatingPopup');
+            if (popup.classList.contains('hidden')) {
+                if (!currentData) { 
+                    alert(t('alertFetchFirst')); 
+                    return; 
+                }
+                isLiveMode = false;
+                updateModeBtn();
+                renderPopupContent();
+                popup.classList.remove('hidden');
+                popup.style.width = '400px';
+                popup.style.height = '320px';
+                updatePopupPosition();
             }
         }
 
-        function openPopupWindow() {
-            if (!currentData) { 
-                alert(t('alertFetchFirst')); 
-                return; 
-            }
-            
-            const w = isLiveMode ? 620 : 400;
-            const h = isLiveMode ? 140 : 360; 
-
-            popupWindow = window.open('', 'RankMonitor', `width=${w},height=${h},menubar=no,toolbar=no,location=no,status=no,resizable=yes`);
-
-            if (!popupWindow) {
-                alert("Popup blocked. Please allow popups for this site.");
-                return;
-            }
-
-            const doc = popupWindow.document;
-            doc.open();
-            doc.write(`
-                <!DOCTYPE html>
-                <html lang="${document.documentElement.lang}">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>${t('popupTitle')}</title>
-                    <base href="${window.location.href}">
-                    <script src="https://cdn.tailwindcss.com"><\/script>
-                    <style>
-                        body { margin: 0; padding: 0; background-color: #0f172a; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-                        .cloak { opacity: 0; }
-                    </style>
-                </head>
-                <body>
-                    <div id="popupHeader" class="flex-shrink-0 h-8 flex justify-between items-center px-2 bg-black/40 border-b border-white/10 select-none user-select-none">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-bold text-gray-300 tracking-wider">${t('popupTitle')}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button id="modeToggleBtn" class="btn-live-toggle" style="font-size: 10px; padding: 3px 10px; background: #2563eb; color: white; border-radius: 4px; border: none; cursor: pointer;">${isLiveMode ? t('liveModeOn') : t('liveModeOff')}</button>
-                        </div>
-                    </div>
-                    <div id="popupBody" class="flex-grow w-full relative overflow-hidden bg-slate-900/95 backdrop-blur">
-                        <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm">Loading...</div>
-                    </div>
-                </body>
-                </html>
-            `);
-            doc.close();
-
-            const styles = document.querySelectorAll('style');
-            styles.forEach(s => {
-                const newStyle = doc.createElement('style');
-                newStyle.textContent = s.textContent;
-                doc.head.appendChild(newStyle);
-            });
-
-            setTimeout(() => {
-                const btn = doc.getElementById('modeToggleBtn');
-                if (btn) {
-                    btn.onclick = () => {
-                        window.togglePopupMode();
-                    };
-                }
-                renderPopupContent();
-            }, 100);
-
-            popupWindow.onbeforeunload = () => {
-                popupWindow = null;
-            };
+        function closeFloatingPopup() {
+            document.getElementById('floatingPopup').classList.add('hidden');
         }
 
         function togglePopupMode() {
             isLiveMode = !isLiveMode;
             updateModeBtn();
+            const popup = document.getElementById('floatingPopup');
             
-            if (popupWindow && !popupWindow.closed) {
-                const w = isLiveMode ? 620 : 400;
-                const h = isLiveMode ? 140 : 360;
-                popupWindow.resizeTo(w, h);
-                
-                const btn = popupWindow.document.getElementById('modeToggleBtn');
-                if (btn) {
-                    btn.innerText = isLiveMode ? t('liveModeOn') : t('liveModeOff');
-                    btn.className = isLiveMode ? 'btn-live-toggle active-mode' : 'btn-live-toggle';
-                }
-                
-                renderPopupContent();
+            if (isLiveMode) {
+                popup.style.width = '620px';
+                popup.style.height = '100px';
+            } else {
+                popup.style.width = '400px';
+                popup.style.height = '320px';
             }
+            renderPopupContent();
+            updatePopupPosition();
         }
 
         function updateModeBtn() {
-            // 親ウィンドウ側にはモードボタンがないので何もしないが、将来のために残す
+            const btn = document.getElementById('modeToggleBtn');
+            if (isLiveMode) {
+                btn.innerText = t('liveModeOn');
+                btn.classList.add('active-mode');
+            } else {
+                btn.innerText = t('liveModeOff');
+                btn.classList.remove('active-mode');
+            }
         }
 
         function renderPopupContent() {
-            if (!currentData || !popupWindow || popupWindow.closed) return;
-            
-            const container = popupWindow.document.getElementById('popupContentContainer');
-            if (!container) return;
-
+            if (!currentData) return;
+            const container = document.getElementById('popupContentContainer');
             const { tier, rank, lp, wins, losses, history } = currentData;
             
             let rankImgHtml = '';
@@ -1001,10 +1028,12 @@
                                 else { losses++; history.push(false); }
                             }
                         }
+                        // Progress update
                         const label = document.getElementById('matchCountLabel');
                         if(label) label.innerText = `(${i + 1} / ${matchIds.length})`;
                     } catch (e) {
                         console.warn(`Failed to fetch match ${matchIds[i]}`, e);
+                        // Continue loop even if one match fails
                     }
                 }
                 updateStepUI('step-matches', 'success');
@@ -1024,7 +1053,7 @@
                 };
 
                 displayFinalResults();
-                if (popupWindow && !popupWindow.closed) {
+                if (!document.getElementById('floatingPopup').classList.contains('hidden')) {
                     renderPopupContent();
                 }
             } catch (err) {
@@ -1033,6 +1062,7 @@
         }
 
         async function fetchWithRetry(url) {
+            // Remove protocol and use local proxy path
             const path = url.replace(/^https?:\/\//, '');
             const proxiedUrl = `/api/riot/${path}`;
 
@@ -1124,31 +1154,42 @@
             document.getElementById('fetchProgress').classList.add('hidden');
         }
 
+        /**
+         * API Rate Limiter Injection
+         * Enforces a maximum of 115 requests per minute to comply with API limits.
+         */
         (function() {
             const originalFetch = window.fetchWithRetry;
             const RATE_LIMIT = 115;
-            const TIME_WINDOW = 60000; 
+            const TIME_WINDOW = 60000; // 1 minute
             const requestTimestamps = [];
 
+            // Override the existing fetchWithRetry function
             window.fetchWithRetry = async function(url) {
                 const now = Date.now();
                 
+                // Clear timestamps older than the time window
                 while (requestTimestamps.length > 0 && requestTimestamps[0] <= now - TIME_WINDOW) {
                     requestTimestamps.shift();
                 }
 
+                // Check if rate limit is reached
                 if (requestTimestamps.length >= RATE_LIMIT) {
                     const oldestTimestamp = requestTimestamps[0];
-                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100;
+                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100; // Add small buffer
                     
                     if (waitTime > 0) {
                         console.log(`[Rate Limiter] Limit reached. Waiting ${waitTime}ms before next request...`);
                         await new Promise(resolve => setTimeout(resolve, waitTime));
+                        // Retry the call after waiting
                         return window.fetchWithRetry(url);
                     }
                 }
 
+                // Log the request timestamp
                 requestTimestamps.push(Date.now());
+
+                // Execute the original function
                 return originalFetch(url);
             };
             
