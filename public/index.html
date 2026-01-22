@@ -75,7 +75,7 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 0; /* gapを削除して個別にpadding制御 */
+            gap: 0;
             padding-right: 0.5rem;
             padding-left: 0.25rem;
         }
@@ -84,7 +84,6 @@
             border-color: rgba(59, 130, 246, 0.4);
         }
         
-        /* お気に入りボタンのスタイル */
         .favorite-btn {
             display: flex;
             align-items: center;
@@ -96,7 +95,7 @@
             transition: all 0.2s;
         }
         .favorite-btn:hover {
-            color: #fbbf24; /* amber-400 */
+            color: #fbbf24;
             transform: scale(1.1);
         }
         .favorite-btn.active {
@@ -150,35 +149,6 @@
             accent-color: #3b82f6;
             width: 16px;
             height: 16px;
-        }
-        
-        #floatingPopup {
-            resize: both;
-            overflow: hidden;
-            min-width: 150px;
-            min-height: 100px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            display: flex;
-            flex-direction: column;
-            container-type: size;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        #floatingPopup.hidden { display: none; }
-        
-        #popupHeader {
-            flex-shrink: 0; height: 32px; cursor: move;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 8px; background: rgba(0, 0, 0, 0.4);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            user-select: none;
-        }
-
-        #popupBody {
-            flex-grow: 1; width: 100%; height: calc(100% - 32px);
-            position: relative; overflow: hidden;
         }
 
         .cq-container { width: 100%; height: 100%; }
@@ -445,31 +415,6 @@
         </div>
     </div>
 
-    <!-- Draggable Popup -->
-    <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl" style="top: 100px; left: 50%; transform: translateX(-50%); width: 400px; height: 320px;">
-        <div id="popupHeader">
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
-                <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-        <div id="popupBody">
-            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
-                No Data.
-            </div>
-        </div>
-    </div>
-
     <script>
         const MAX_HISTORY = 10;
         
@@ -479,6 +424,7 @@
 
         let currentData = null;
         let isLiveMode = false;
+        let popupWindow = null;
 
         const i18n = {
             ja: {
@@ -654,7 +600,6 @@
             }
             renderHistory();
             changeLanguage();
-            initDraggable();
             adjustAppScale();
         });
 
@@ -662,38 +607,6 @@
             const lang = document.getElementById('langSelect').value;
             const texts = i18n[lang] || i18n['en'];
             return texts[key] || key;
-        }
-
-        function initDraggable() {
-            const popup = document.getElementById("floatingPopup");
-            const header = document.getElementById("popupHeader");
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
-
-            header.addEventListener("mousedown", (e) => {
-                if (e.target.closest('button')) return;
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                const rect = popup.getBoundingClientRect();
-                initialLeft = rect.left;
-                initialTop = rect.top;
-                popup.style.transform = 'none'; 
-                popup.style.left = `${initialLeft}px`;
-                popup.style.top = `${initialTop}px`;
-                document.body.style.userSelect = "none";
-            });
-
-            document.addEventListener("mousemove", (e) => {
-                if (!isDragging) return;
-                popup.style.left = `${initialLeft + (e.clientX - startX)}px`;
-                popup.style.top = `${initialTop + (e.clientY - startY)}px`;
-            });
-
-            document.addEventListener("mouseup", () => {
-                isDragging = false;
-                document.body.style.userSelect = "auto";
-            });
         }
 
         function changeLanguage() {
@@ -870,54 +783,122 @@
         }
 
         function toggleFloatingPopup() {
-            const popup = document.getElementById('floatingPopup');
-            if (popup.classList.contains('hidden')) {
-                if (!currentData) { 
-                    alert(t('alertFetchFirst')); 
-                    return; 
-                }
-                isLiveMode = false;
-                updateModeBtn();
-                renderPopupContent();
-                popup.classList.remove('hidden');
-                popup.style.width = '400px';
-                popup.style.height = '320px';
+            if (popupWindow && !popupWindow.closed) {
+                popupWindow.close();
+                popupWindow = null;
+                return;
             }
-        }
 
-        function closeFloatingPopup() {
-            document.getElementById('floatingPopup').classList.add('hidden');
+            if (!currentData) {
+                alert(t('alertFetchFirst'));
+                return;
+            }
+
+            const width = isLiveMode ? 620 : 400;
+            const height = isLiveMode ? 140 : 320;
+            
+            popupWindow = window.open('', 'RankMonitor', `width=${width},height=${height},resizable=yes`);
+            
+            if (!popupWindow) {
+                alert("Popup blocked! Please allow popups for this site.");
+                return;
+            }
+
+            const baseHref = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+            const styles = document.querySelector('style').innerHTML;
+
+            popupWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <base href="${baseHref}">
+                    <title>Rank Monitor</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        ${styles}
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            width: 100vw;
+                            height: 100vh;
+                            overflow: hidden;
+                            background-color: #0f172a;
+                            display: flex;
+                            flex-direction: column;
+                            container-type: size;
+                        }
+                        #popupControl {
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            z-index: 50;
+                            padding: 4px;
+                            opacity: 0;
+                            transition: opacity 0.2s;
+                        }
+                        body:hover #popupControl {
+                            opacity: 1;
+                        }
+                        .cq-container {
+                            width: 100%;
+                            height: 100%;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="popupControl">
+                        <button id="popModeBtn" class="btn-live-toggle shadow-lg border border-white/20">Mode</button>
+                    </div>
+                    <div id="popupBody" class="w-full h-full"></div>
+                </body>
+                </html>
+            `);
+            popupWindow.document.close();
+
+            setTimeout(() => {
+                renderPopupContent();
+                const btn = popupWindow.document.getElementById('popModeBtn');
+                if(btn) {
+                    btn.onclick = () => window.togglePopupMode();
+                    btn.innerText = isLiveMode ? t('liveModeOn') : t('liveModeOff');
+                    if(isLiveMode) btn.classList.add('active-mode');
+                }
+            }, 100);
+
+            popupWindow.onbeforeunload = () => {
+                popupWindow = null;
+            };
         }
 
         function togglePopupMode() {
             isLiveMode = !isLiveMode;
             updateModeBtn();
-            const popup = document.getElementById('floatingPopup');
             
-            if (isLiveMode) {
-                popup.style.width = '620px';
-                popup.style.height = '100px';
-            } else {
-                popup.style.width = '400px';
-                popup.style.height = '320px';
+            if (popupWindow && !popupWindow.closed) {
+                const width = isLiveMode ? 620 : 400;
+                const height = isLiveMode ? 140 : 320;
+                popupWindow.resizeTo(width, height);
+
+                const btn = popupWindow.document.getElementById('popModeBtn');
+                if (btn) {
+                    btn.innerText = isLiveMode ? t('liveModeOn') : t('liveModeOff');
+                    if (isLiveMode) btn.classList.add('active-mode');
+                    else btn.classList.remove('active-mode');
+                }
+                
+                renderPopupContent();
             }
-            renderPopupContent();
         }
 
         function updateModeBtn() {
-            const btn = document.getElementById('modeToggleBtn');
-            if (isLiveMode) {
-                btn.innerText = t('liveModeOn');
-                btn.classList.add('active-mode');
-            } else {
-                btn.innerText = t('liveModeOff');
-                btn.classList.remove('active-mode');
-            }
+            // Main window UI update if needed (currently popup button handles mode logic internally mostly)
         }
 
         function renderPopupContent() {
-            if (!currentData) return;
-            const container = document.getElementById('popupContentContainer');
+            if (!currentData || !popupWindow || popupWindow.closed) return;
+            const container = popupWindow.document.getElementById('popupBody');
+            if (!container) return;
+
             const { tier, rank, lp, wins, losses, history } = currentData;
             
             let rankImgHtml = '';
@@ -1035,7 +1016,6 @@
                         if(label) label.innerText = `(${i + 1} / ${matchIds.length})`;
                     } catch (e) {
                         console.warn(`Failed to fetch match ${matchIds[i]}`, e);
-                        // Continue loop even if one match fails
                     }
                 }
                 updateStepUI('step-matches', 'success');
@@ -1055,16 +1035,13 @@
                 };
 
                 displayFinalResults();
-                if (!document.getElementById('floatingPopup').classList.contains('hidden')) {
-                    renderPopupContent();
-                }
+                renderPopupContent();
             } catch (err) {
                 showError(err.message);
             }
         }
 
         async function fetchWithRetry(url) {
-            // Remove protocol and use local proxy path
             const path = url.replace(/^https?:\/\//, '');
             const proxiedUrl = `/api/riot/${path}`;
 
@@ -1156,42 +1133,30 @@
             document.getElementById('fetchProgress').classList.add('hidden');
         }
 
-        /**
-         * API Rate Limiter Injection
-         * Enforces a maximum of 115 requests per minute to comply with API limits.
-         */
         (function() {
             const originalFetch = window.fetchWithRetry;
             const RATE_LIMIT = 115;
-            const TIME_WINDOW = 60000; // 1 minute
+            const TIME_WINDOW = 60000;
             const requestTimestamps = [];
 
-            // Override the existing fetchWithRetry function
             window.fetchWithRetry = async function(url) {
                 const now = Date.now();
-                
-                // Clear timestamps older than the time window
                 while (requestTimestamps.length > 0 && requestTimestamps[0] <= now - TIME_WINDOW) {
                     requestTimestamps.shift();
                 }
 
-                // Check if rate limit is reached
                 if (requestTimestamps.length >= RATE_LIMIT) {
                     const oldestTimestamp = requestTimestamps[0];
-                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100; // Add small buffer
+                    const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100;
                     
                     if (waitTime > 0) {
                         console.log(`[Rate Limiter] Limit reached. Waiting ${waitTime}ms before next request...`);
                         await new Promise(resolve => setTimeout(resolve, waitTime));
-                        // Retry the call after waiting
                         return window.fetchWithRetry(url);
                     }
                 }
 
-                // Log the request timestamp
                 requestTimestamps.push(Date.now());
-
-                // Execute the original function
                 return originalFetch(url);
             };
             
