@@ -1160,23 +1160,35 @@
                 let wins = 0, losses = 0;
                 let history = [];
 
-                for (let i = 0; i < matchIds.length; i++) {
+                let processedCount = 0;
+                const matchPromises = matchIds.map(async (matchId) => {
                     try {
-                        const matchData = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/${matchIds[i]}`);
+                        const matchData = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/${matchId}`);
+                        processedCount++;
+                        const label = document.getElementById('matchCountLabel');
+                        if(label) label.innerText = `(${processedCount} / ${matchIds.length})`;
+
                         if (matchData && matchData.info && matchData.info.participants) {
                             const participant = matchData.info.participants.find(p => p.puuid === accountData.puuid);
                             if (participant) { 
-                                const isWin = participant.win;
-                                if (isWin) { wins++; history.push(true); }
-                                else { losses++; history.push(false); }
+                                return participant.win;
                             }
                         }
-                        const label = document.getElementById('matchCountLabel');
-                        if(label) label.innerText = `(${i + 1} / ${matchIds.length})`;
+                        return null;
                     } catch (e) {
-                        console.warn(`Failed to fetch match ${matchIds[i]}`, e);
+                        console.warn(`Failed to fetch match ${matchId}`, e);
+                        processedCount++;
+                        return null;
                     }
-                }
+                });
+
+                const results = await Promise.all(matchPromises);
+                
+                results.forEach(result => {
+                    if (result === true) { wins++; history.push(true); }
+                    else if (result === false) { losses++; history.push(false); }
+                });
+
                 updateStepUI('step-matches', 'success');
                 
                 const soloRank = leagueData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
@@ -1271,7 +1283,10 @@
             const color = getTierColor(data.tier);
             document.getElementById('rankText').innerText = `${data.tier} ${data.rank}`;
             document.getElementById('rankText').style.color = color;
-            document.getElementById('lpValue').innerText = `${data.lp} LP`;
+            const lpEl = document.getElementById('lpValue');
+            lpEl.innerText = `${data.lp} LP`;
+            lpEl.style.color = color;
+            lpEl.style.textShadow = '0 0 10px currentColor';
             
             const iconContainer = document.getElementById('rankIconContainer');
             if (data.tier === "UNRANKED") {
