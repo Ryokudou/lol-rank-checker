@@ -29,6 +29,7 @@
         body.popup-window-mode {
             background: #0f172a; /* ウィンドウキャプチャ用に背景色を確保 */
             background-image: none;
+            overflow: hidden !important; /* スクロールバー完全抑止 */
         }
         
         body.popup-window-mode #app-scale-wrapper {
@@ -383,7 +384,7 @@
                                     <div id="historyList" class="flex flex-wrap gap-2 mb-2"></div>
                                 </div>
                                 <div class="flex flex-col gap-3 mt-2">
-                                    <button onclick="startSequentialFetch()" id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
+                                    <button onclick="startFetch()" id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
                                         <span data-i18n="btnSearch">Fetch Stats</span>
                                     </button>
                                     <div class="flex items-center justify-between px-1">
@@ -723,16 +724,27 @@
         });
         
         function initPopupMode() {
-            // ローカルストレージから初期データ取得（初回表示のチラつき防止）
+            // URLパラメータからlive値を最優先で取得
+            const urlLiveParam = urlParams.get('live');
+            
+            // ローカルストレージから初期データ取得
             const syncedData = localStorage.getItem('lol_rank_sync_data');
             if (syncedData) {
                 try {
                     const parsed = JSON.parse(syncedData);
                     currentData = parsed.data;
-                    isLiveMode = parsed.isLiveMode;
+                    
+                    // URLパラメータがあればそれを優先してモード決定、なければストレージの値
+                    if (urlLiveParam !== null) {
+                        isLiveMode = (urlLiveParam === '1');
+                    } else {
+                        isLiveMode = parsed.isLiveMode;
+                    }
+
                     const lang = parsed.lang || 'ja';
                     document.getElementById('langSelect').value = lang;
                     changeLanguage();
+                    updateModeBtn(); // ボタン表示更新
                     renderPopupContent();
                 } catch(e) { console.error(e); }
             }
@@ -747,7 +759,6 @@
                     updateModeBtn();
                     renderPopupContent();
                     // ウィンドウサイズも合わせたいところだが、セキュリティ制限で効かない場合が多い
-                    // 一応試みる
                     try {
                         if (isLiveMode) window.resizeTo(1101, 225);
                         else window.resizeTo(436, 396);
@@ -958,7 +969,7 @@
             const diff = nextRefreshTime - now;
 
             if (diff <= 0) {
-                startSequentialFetch(true);
+                startFetch(true);
                 nextRefreshTime = now + REFRESH_INTERVAL_MS;
                 const m = Math.floor(REFRESH_INTERVAL_MS / 60000);
                 document.getElementById('timerLabel').innerText = `(${m}:00)`;
@@ -990,8 +1001,11 @@
             }));
 
             // 新しいウィンドウを開く
+            // liveパラメータを付与して、開いた瞬間のモードを確定させる
+            const liveParam = isLiveMode ? '1' : '0';
+            
             window.open(
-                `${window.location.pathname}?mode=popup`, 
+                `${window.location.pathname}?mode=popup&live=${liveParam}`, 
                 'RankMonitorPopup', 
                 `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no`
             );
@@ -1126,7 +1140,7 @@
             }
         }
 
-        async function startSequentialFetch(isAutoRefresh = false) {
+        async function startFetch(isAutoRefresh = false) {
             const nameInput = document.getElementById('gameName').value.trim();
             const tagInput = document.getElementById('tagLine').value.trim().replace('#', '');
             const region = document.getElementById('region').value;
@@ -1146,50 +1160,62 @@
                 if (["na1", "br1", "la1", "la2"].includes(region)) route = "americas";
                 if (["euw1", "eun1", "tr1", "ru"].includes(region)) route = "europe";
 
+                // Step 1: Verify Identity (PUUID)
                 updateStepUI('step-account', 'loading');
                 const accountData = await fetchWithRetry(`https://${route}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(nameInput)}/${encodeURIComponent(tagInput)}`);
                 updateStepUI('step-account', 'success');
 
+                // Step 2 & 3: Parallel Execution (Rank Info & Matches)
                 updateStepUI('step-league', 'loading');
-                const leagueData = await fetchWithRetry(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}`);
-                updateStepUI('step-league', 'success');
-
                 updateStepUI('step-matches', 'loading');
-                const matchIds = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${accountData.puuid}/ids?start=0&count=20&type=ranked`);
-                
-                let wins = 0, losses = 0;
-                let history = [];
 
-                let processedCount = 0;
-                const matchPromises = matchIds.map(async (matchId) => {
-                    try {
-                        const matchData = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/${matchId}`);
-                        processedCount++;
-                        const label = document.getElementById('matchCountLabel');
-                        if(label) label.innerText = `(${processedCount} / ${matchIds.length})`;
+                const leaguePromise = (async () => {
+                    const data = await fetchWithRetry(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${accountData.puuid}`);
+                    updateStepUI('step-league', 'success');
+                    return data;
+                })();
 
-                        if (matchData && matchData.info && matchData.info.participants) {
-                            const participant = matchData.info.participants.find(p => p.puuid === accountData.puuid);
-                            if (participant) { 
-                                return participant.win;
+                const matchesPromise = (async () => {
+                    const matchIds = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${accountData.puuid}/ids?start=0&count=20&type=ranked`);
+                    
+                    let wins = 0, losses = 0;
+                    let history = [];
+                    let processedCount = 0;
+
+                    const matchPromises = matchIds.map(async (matchId) => {
+                        try {
+                            const matchData = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/${matchId}`);
+                            processedCount++;
+                            const label = document.getElementById('matchCountLabel');
+                            if(label) label.innerText = `(${processedCount} / ${matchIds.length})`;
+
+                            if (matchData && matchData.info && matchData.info.participants) {
+                                const participant = matchData.info.participants.find(p => p.puuid === accountData.puuid);
+                                if (participant) { 
+                                    return participant.win;
+                                }
                             }
+                            return null;
+                        } catch (e) {
+                            console.warn(`Failed to fetch match ${matchId}`, e);
+                            processedCount++;
+                            return null;
                         }
-                        return null;
-                    } catch (e) {
-                        console.warn(`Failed to fetch match ${matchId}`, e);
-                        processedCount++;
-                        return null;
-                    }
-                });
+                    });
 
-                const results = await Promise.all(matchPromises);
-                
-                results.forEach(result => {
-                    if (result === true) { wins++; history.push(true); }
-                    else if (result === false) { losses++; history.push(false); }
-                });
+                    const results = await Promise.all(matchPromises);
+                    
+                    results.forEach(result => {
+                        if (result === true) { wins++; history.push(true); }
+                        else if (result === false) { losses++; history.push(false); }
+                    });
 
-                updateStepUI('step-matches', 'success');
+                    updateStepUI('step-matches', 'success');
+                    return { wins, losses, history };
+                })();
+
+                // Wait for both tasks
+                const [leagueData, matchStats] = await Promise.all([leaguePromise, matchesPromise]);
                 
                 const soloRank = leagueData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
                 
@@ -1198,9 +1224,9 @@
                     tier: soloRank ? soloRank.tier : "UNRANKED",
                     rank: soloRank ? soloRank.rank : "",
                     lp: soloRank ? soloRank.leaguePoints : 0,
-                    wins: wins,
-                    losses: losses,
-                    history: history.slice(0, 10),
+                    wins: matchStats.wins,
+                    losses: matchStats.losses,
+                    history: matchStats.history.slice(0, 10),
                     totalWins: soloRank ? soloRank.wins : 0,
                     totalLosses: soloRank ? soloRank.losses : 0
                 };
@@ -1213,7 +1239,7 @@
                     payload: currentData
                 });
 
-                // 通常モードでポップアップが既に表示されている場合（古い挙動の名残だが、一応更新）
+                // 通常モードでポップアップが既に表示されている場合
                 if (!document.getElementById('floatingPopup').classList.contains('hidden') && !isPopupWindow) {
                     renderPopupContent();
                 }
