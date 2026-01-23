@@ -394,7 +394,7 @@
                                                 <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                                             </div>
                                             <div class="flex flex-col">
-                                                <span class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors" data-i18n="lblAutoRefresh">Auto Refresh (20m)</span>
+                                                <span class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors" data-i18n="lblAutoRefresh">Active Monitoring (10m)</span>
                                             </div>
                                             <span id="timerLabel" class="text-xs text-blue-400 font-mono ml-2 hidden"></span>
                                         </label>
@@ -518,7 +518,7 @@
         
         let refreshTimerId = null;
         let nextRefreshTime = 0;
-        const REFRESH_INTERVAL_MS = 20 * 60 * 1000;
+        const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
         let currentData = null;
         let isLiveMode = false;
@@ -545,7 +545,7 @@
                 phTagLine: "#タグ",
                 lblRegion: "サーバー",
                 lblHistory: "最近の検索",
-                lblAutoRefresh: "自動更新 (20分毎)",
+                lblAutoRefresh: "アクティブ・モニタリング (10分)",
                 btnSearch: "戦績を取得する",
                 btnPopup: "ポップアップで開く",
                 progressTitle: "データを分析中...",
@@ -581,7 +581,7 @@
                 phTagLine: "#Tag",
                 lblRegion: "Region",
                 lblHistory: "Recent Searches",
-                lblAutoRefresh: "Auto Refresh (20m)",
+                lblAutoRefresh: "Active Monitoring (10m)",
                 btnSearch: "Fetch Stats",
                 btnPopup: "Open Popup Window",
                 progressTitle: "Analyzing Data...",
@@ -617,7 +617,7 @@
                 phTagLine: "#태그",
                 lblRegion: "지역",
                 lblHistory: "최근 검색",
-                lblAutoRefresh: "자동 갱신 (20분)",
+                lblAutoRefresh: "액티브 모니터링 (10분)",
                 btnSearch: "전적 검색",
                 btnPopup: "팝업 열기",
                 progressTitle: "데이터 분석 중...",
@@ -653,7 +653,7 @@
                 phTagLine: "#标签",
                 lblRegion: "服务器",
                 lblHistory: "最近搜索",
-                lblAutoRefresh: "自动刷新 (20分钟)",
+                lblAutoRefresh: "主动监控 (10分钟)",
                 btnSearch: "查询战绩",
                 btnPopup: "悬浮窗显示",
                 progressTitle: "正在分析数据...",
@@ -674,7 +674,7 @@
                 errRateLimit: "请求过于频繁，请稍候。",
                 errApiKey: "API密钥无效。",
                 errNotFound: "未找到数据 (404)。",
-                alertFetchFirst: "请先查询战绩。",
+                alertFetchFirst: "请先查询战績。",
                 regJp: "日本 (JP)",
                 regNa: "北美 (NA)",
                 regEuw: "西欧 (EUW)",
@@ -964,12 +964,49 @@
             }
         }
 
+        async function checkStatusAndRefresh() {
+            if (!currentData || !currentData.account) return;
+            const puuid = currentData.account.puuid;
+            const region = document.getElementById('region').value;
+
+            try {
+                // 1. 試合中判定
+                try {
+                    await fetchWithRetry(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}`);
+                    // 成功(200) = 試合中
+                    console.log("[Monitor] Player is currently in game. Skipping refresh.");
+                    return; 
+                } catch (e) {
+                    // 404以外はエラーとして中断するが、404（試合中ではない）なら次へ
+                    if (e.message.indexOf('404') === -1 && e.message.indexOf(t('errNotFound')) === -1) {
+                        throw e;
+                    }
+                }
+
+                // 2. LP変動確認
+                const leagueData = await fetchWithRetry(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`);
+                const soloRank = leagueData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
+                const currentLP = soloRank ? soloRank.leaguePoints : 0;
+                const currentTier = soloRank ? soloRank.tier : "UNRANKED";
+
+                // 画面上のデータと比較 (currentDataは全データ更新時にセットされる)
+                if (currentLP !== currentData.lp || currentTier !== currentData.tier) {
+                    console.log("[Monitor] Rank/LP change detected. Starting full fetch.");
+                    await startFetch(true);
+                } else {
+                    console.log("[Monitor] No LP change. Skipping full refresh.");
+                }
+            } catch (err) {
+                console.error("[Monitor] Error during checkStatusAndRefresh:", err);
+            }
+        }
+
         function updateTimerAndFetch() {
             const now = Date.now();
             const diff = nextRefreshTime - now;
 
             if (diff <= 0) {
-                startFetch(true);
+                checkStatusAndRefresh();
                 nextRefreshTime = now + REFRESH_INTERVAL_MS;
                 const m = Math.floor(REFRESH_INTERVAL_MS / 60000);
                 document.getElementById('timerLabel').innerText = `(${m}:00)`;
