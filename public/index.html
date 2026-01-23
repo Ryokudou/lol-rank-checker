@@ -256,41 +256,48 @@
         /* LIVEモードのレイアウト */
         .layout-live {
             display: flex; flex-direction: row; align-items: center;
-            padding: 6px 16px; /* 余裕のある透明な枠（パディング） */
-            background: transparent; gap: 15px;
-            height: 100%; width: 100%; box-sizing: border-box;
-            justify-content: flex-start;
-            border: 4px solid transparent; /* 透明な枠（ボーダー） */
+            /* 周りにスペースを空け、見えない透明の枠を小さく作成 */
+            padding: 0 10px; background: transparent; gap: 12px;
+            height: 90%; /* 高さ90%に縮小して中央配置 */
+            width: 96%;  /* 幅96%に縮小して中央配置 */
+            margin: auto; /* 上下左右中央 */
+            box-sizing: border-box;
+            justify-content: center; /* 中央寄せ */
         }
         .layout-live .cq-rank-icon {
-            height: 90cqh; width: auto; max-width: 25cqw;
+            /* 見切れ防止のため少しサイズ調整 */
+            height: 85cqh; width: auto; max-width: 25cqw;
             object-fit: contain; filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
             flex-shrink: 0;
         }
         .layout-live .cq-content {
             display: flex; flex-direction: column; justify-content: center;
-            align-items: flex-start; height: 100%; flex-grow: 1;
-            gap: 4cqh;
+            align-items: flex-start; height: 100%; 
+            flex-grow: 0; /* コンテンツ幅に合わせる */
+            gap: 3cqh;
         }
         
         .layout-live .cq-rank-row {
-            display: flex; flex-direction: row; align-items: baseline; gap: 10px;
+            display: flex; flex-direction: row; align-items: baseline; gap: 8px;
         }
         .layout-live .cq-rank-text {
-            font-size: 34cqh; font-weight: 900; white-space: nowrap;
+            /* 見切れ防止のためフォントサイズ調整: 34cqh -> 30cqh */
+            font-size: 30cqh; font-weight: 900; white-space: nowrap;
             text-shadow: 0 0 10px currentColor; line-height: 1; text-align: left;
         }
         .layout-live .cq-lp-text { 
-            font-size: 34cqh; font-weight: 900; line-height: 1;
+            /* 見切れ防止のためフォントサイズ調整: 34cqh -> 30cqh */
+            font-size: 30cqh; font-weight: 900; line-height: 1;
             text-shadow: 0 0 10px currentColor;
         }
 
         .layout-live .cq-stats-row {
-            display: flex; flex-direction: row; align-items: center; gap: 15px;
+            display: flex; flex-direction: row; align-items: center; gap: 12px;
         }
         .layout-live .cq-stat-item { display: flex; align-items: center; gap: 4px; }
-        .layout-live .cq-stat-label { font-size: 20cqh; opacity: 0.9; font-weight: bold; line-height: 1; }
-        .layout-live .cq-stat-value { font-size: 20cqh; color: white; font-weight: 800; line-height: 1; }
+        /* フォントサイズ微調整 */
+        .layout-live .cq-stat-label { font-size: 18cqh; opacity: 0.9; font-weight: bold; line-height: 1; }
+        .layout-live .cq-stat-value { font-size: 18cqh; color: white; font-weight: 800; line-height: 1; }
 
         .layout-live .history-bar {
             display: flex; align-items: center; gap: 0;
@@ -748,12 +755,6 @@
                     changeLanguage();
                     updateModeBtn(); // ボタン表示更新
                     renderPopupContent();
-                    
-                    // 初期リサイズ
-                    try {
-                        if (isLiveMode) window.resizeTo(866, 210);
-                        else window.resizeTo(436, 396);
-                    } catch(e) {}
                 } catch(e) { console.error(e); }
             }
 
@@ -768,7 +769,7 @@
                     renderPopupContent();
                     // ウィンドウサイズも合わせたいところだが、セキュリティ制限で効かない場合が多い
                     try {
-                        if (isLiveMode) window.resizeTo(866, 210);
+                        if (isLiveMode) window.resizeTo(836, 225);
                         else window.resizeTo(436, 396);
                     } catch(e) {}
                 }
@@ -1033,9 +1034,8 @@
             }
 
             // サイズ調整: LIVEモード2.5倍、通常モード1.5倍
-            // LIVEモードは幅を広げすぎず、適度な幅に調整
-            const width = isLiveMode ? 850 : 420;
-            const height = isLiveMode ? 160 : 336;
+            const width = isLiveMode ? 820 : 420;
+            const height = isLiveMode ? 175 : 336;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
             
@@ -1075,8 +1075,8 @@
             if (!isPopupWindow) {
                 // 通常モード内のドラッグ可能ポップアップのサイズ調整
                 if (isLiveMode) {
-                    popup.style.width = '850px';
-                    popup.style.height = '160px';
+                    popup.style.width = '820px';
+                    popup.style.height = '175px';
                 } else {
                     popup.style.width = '420px';
                     popup.style.height = '336px';
@@ -1085,7 +1085,7 @@
                 // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
                 try {
                     // 枠分を適当に考慮
-                    if (isLiveMode) window.resizeTo(866, 210);
+                    if (isLiveMode) window.resizeTo(836, 225);
                     else window.resizeTo(436, 396);
                 } catch(e) {
                     console.log('Window resize blocked by browser');
