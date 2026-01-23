@@ -6,7 +6,7 @@
     <title>LoL Rank Checker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
         
         body {
             font-family: 'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif;
@@ -221,9 +221,10 @@
         .layout-normal {
             display: flex; flex-direction: column; width: 100%; height: 100%;
             padding: 2cqh; box-sizing: border-box; align-items: center;
+            justify-content: center;
         }
         .layout-normal .section-icon {
-            flex: 0 0 45%; display: flex; align-items: center;
+            flex: 0 0 40%; display: flex; align-items: center;
             justify-content: center; width: 100%; overflow: hidden; padding-bottom: 1cqh;
         }
         .layout-normal .cq-rank-icon {
@@ -233,15 +234,18 @@
         .layout-normal .section-info {
             flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: flex-start; width: 100%;
-            gap: 1cqh; padding-top: 1cqh;
+            gap: 0.5cqh; padding-top: 0;
         }
         .layout-normal .cq-rank-text {
-            font-size: 13cqh; width: 100%; text-align: center;
+            font-size: 14cqh; width: 100%; text-align: center;
             white-space: nowrap; line-height: 1; font-weight: 900;
+            text-shadow: 0 0 10px currentColor;
+            margin-bottom: 0.5cqh;
         }
         .layout-normal .cq-lp-text { 
-            font-size: 16cqh; line-height: 1; font-family: monospace;
-            color: #4ade80; font-weight: 700; margin-bottom: 2cqh;
+            font-size: 14cqh; line-height: 1; font-weight: 900;
+            margin-bottom: 2cqh;
+            text-shadow: 0 0 10px currentColor;
         }
         .layout-normal .cq-stats-group { display: flex; align-items: center; gap: 6cqw; }
         .layout-normal .cq-stat-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -271,11 +275,11 @@
         }
         .layout-live .cq-rank-text {
             font-size: 34cqh; font-weight: 900; white-space: nowrap;
-            text-shadow: 0 0 3px rgba(0,0,0,0.8); line-height: 1; text-align: left;
+            text-shadow: 0 0 10px currentColor; line-height: 1; text-align: left;
         }
         .layout-live .cq-lp-text { 
-            font-size: 32cqh; font-family: monospace; color: #4ade80;
-            font-weight: 700; line-height: 1;
+            font-size: 34cqh; font-weight: 900; line-height: 1;
+            text-shadow: 0 0 10px currentColor;
         }
 
         .layout-live .cq-stats-row {
@@ -286,12 +290,16 @@
         .layout-live .cq-stat-value { font-size: 20cqh; color: white; font-weight: 800; line-height: 1; }
 
         .layout-live .history-bar {
-            display: flex; align-items: center; gap: 1cqh;
+            display: flex; align-items: center; gap: 0;
             height: 16cqh; margin-left: 5px;
         }
         .layout-live .history-block {
-            width: 4cqh; min-width: 2px; height: 100%; border-radius: 2px; opacity: 0.9;
+            width: 8cqh; min-width: 2px; height: 100%; border-radius: 2px; opacity: 0.9;
         }
+        .layout-live .history-spacer {
+            width: 2cqh; height: 100%; background: transparent;
+        }
+
         .block-win { background-color: #3b82f6; box-shadow: 0 0 2px rgba(59, 130, 246, 0.4); }
         .block-loss { background-color: #f87171; box-shadow: 0 0 2px rgba(248, 113, 113, 0.4); }
 
@@ -1060,9 +1068,13 @@
                 let historyHtml = '';
                 if (history && history.length > 0) {
                     historyHtml = `<div class="history-bar">`;
-                    history.forEach(isWin => {
+                    history.forEach((isWin, index) => {
                         const className = isWin ? 'block-win' : 'block-loss';
                         historyHtml += `<div class="history-block ${className}"></div>`;
+                        // 最後の要素以外にスペーサーを追加
+                        if (index < history.length - 1) {
+                            historyHtml += `<div class="history-spacer"></div>`;
+                        }
                     });
                     historyHtml += `</div>`;
                 }
@@ -1073,7 +1085,7 @@
                         <div class="cq-content">
                             <div class="cq-rank-row">
                                 <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
-                                <div class="cq-lp-text">${lp} LP</div>
+                                <div class="cq-lp-text" style="color: ${color}">${lp} LP</div>
                             </div>
                             <div class="cq-stats-row">
                                 <div class="cq-stat-item">
@@ -1097,7 +1109,7 @@
                         </div>
                         <div class="section-info">
                             <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
-                            <div class="cq-lp-text">${lp} LP</div>
+                            <div class="cq-lp-text" style="color: ${color}">${lp} LP</div>
                             <div class="cq-stats-group">
                                 <div class="cq-stat-item">
                                     <div class="cq-stat-label" style="color: #60a5fa">W</div>
