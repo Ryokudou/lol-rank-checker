@@ -216,101 +216,85 @@
             position: relative; overflow: hidden;
         }
 
-        .cq-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-
-        /* 全体を囲む透明な枠 */
-        .status-wrapper {
-            display: flex;
-            align-items: center;
-            padding: 2cqh 3cqw;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            max-width: 95%;
-            max-height: 95%;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+        .cq-container { width: 100%; height: 100%; }
 
         /* 通常モードのレイアウト */
-        .layout-normal .status-wrapper {
-            flex-direction: column;
-            width: auto;
-            height: auto;
-            padding: 4cqh 6cqw;
+        .layout-normal {
+            display: flex; flex-direction: column; width: 100%; height: 100%;
+            padding: 2cqh; box-sizing: border-box; align-items: center;
+            justify-content: center;
         }
         .layout-normal .section-icon {
-            flex-shrink: 0; display: flex; align-items: center;
+            flex: 0 0 40%; display: flex; align-items: center;
             justify-content: center; width: 100%; overflow: hidden; padding-bottom: 1cqh;
         }
         .layout-normal .cq-rank-icon {
-            height: 35cqh; width: auto; max-width: 100%;
+            height: 100%; width: auto; max-width: 80%;
             object-fit: contain; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
         }
         .layout-normal .section-info {
-            display: flex; flex-direction: column;
+            flex: 1; display: flex; flex-direction: column;
             align-items: center; justify-content: flex-start; width: 100%;
             gap: 0.5cqh; padding-top: 0;
         }
         .layout-normal .cq-rank-text {
-            font-size: 10cqh; width: 100%; text-align: center;
-            white-space: nowrap; line-height: 1.1; font-weight: 900;
+            font-size: 14cqh; width: 100%; text-align: center;
+            white-space: nowrap; line-height: 1; font-weight: 900;
             text-shadow: 0 0 10px currentColor;
+            margin-bottom: 0.5cqh;
         }
         .layout-normal .cq-lp-text { 
-            font-size: 10cqh; line-height: 1.1; font-weight: 900;
-            margin-bottom: 1cqh;
+            font-size: 14cqh; line-height: 1; font-weight: 900;
+            margin-bottom: 2cqh;
             text-shadow: 0 0 10px currentColor;
         }
-        .layout-normal .cq-stats-group { display: flex; align-items: center; gap: 4cqw; }
-        .layout-normal .cq-stat-item { display: flex; align-items: center; gap: 1cqw; }
-        .layout-normal .cq-stat-label { font-size: 8cqh; font-weight: bold; line-height: 1; }
-        .layout-normal .cq-stat-value { font-size: 8cqh; font-weight: 800; line-height: 1; color: white; }
+        .layout-normal .cq-stats-group { display: flex; align-items: center; gap: 6cqw; }
+        .layout-normal .cq-stat-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .layout-normal .cq-stat-label { font-size: 12cqh; margin-bottom: 0.5cqh; font-weight: bold; line-height: 1; }
+        .layout-normal .cq-stat-value { font-size: 9cqh; font-weight: 800; line-height: 1; color: white; }
 
         /* LIVEモードのレイアウト */
-        .layout-live .status-wrapper {
-            flex-direction: row;
-            padding: 2cqh 4cqw;
-            gap: 4cqw;
-            width: auto;
-            height: 80cqh;
+        .layout-live {
+            display: flex; flex-direction: row; align-items: center;
+            padding: 6px 16px; /* 余裕のある透明な枠（パディング） */
+            background: transparent; gap: 15px;
+            height: 100%; width: 100%; box-sizing: border-box;
+            justify-content: flex-start;
+            border: 4px solid transparent; /* 透明な枠（ボーダー） */
         }
         .layout-live .cq-rank-icon {
-            height: 100%; width: auto; max-width: 20cqw;
+            height: 90cqh; width: auto; max-width: 25cqw;
             object-fit: contain; filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
             flex-shrink: 0;
         }
         .layout-live .cq-content {
             display: flex; flex-direction: column; justify-content: center;
-            align-items: flex-start; height: 100%; flex-grow: 0;
-            gap: 2cqh;
+            align-items: flex-start; height: 100%; flex-grow: 1;
+            gap: 4cqh;
         }
         
         .layout-live .cq-rank-row {
-            display: flex; flex-direction: row; align-items: baseline; gap: 4cqw;
-            width: 100%; justify-content: space-between;
+            display: flex; flex-direction: row; align-items: baseline; gap: 10px;
         }
         .layout-live .cq-rank-text {
-            font-size: 30cqh; font-weight: 900; white-space: nowrap;
+            font-size: 34cqh; font-weight: 900; white-space: nowrap;
             text-shadow: 0 0 10px currentColor; line-height: 1; text-align: left;
         }
         .layout-live .cq-lp-text { 
-            font-size: 30cqh; font-weight: 900; line-height: 1;
+            font-size: 34cqh; font-weight: 900; line-height: 1;
             text-shadow: 0 0 10px currentColor;
-            margin-left: auto; /* LPを右側に寄せる */
         }
 
         .layout-live .cq-stats-row {
-            display: flex; flex-direction: row; align-items: center; gap: 4cqw;
-            width: 100%;
+            display: flex; flex-direction: row; align-items: center; gap: 15px;
         }
-        .layout-live .cq-stat-item { display: flex; align-items: center; gap: 1.5cqw; }
+        .layout-live .cq-stat-item { display: flex; align-items: center; gap: 4px; }
         .layout-live .cq-stat-label { font-size: 20cqh; opacity: 0.9; font-weight: bold; line-height: 1; }
         .layout-live .cq-stat-value { font-size: 20cqh; color: white; font-weight: 800; line-height: 1; }
 
         .layout-live .history-bar {
             display: flex; align-items: center; gap: 0;
-            height: 16cqh; margin-left: auto; /* 履歴も右側に合わせる */
+            height: 16cqh; margin-left: 5px;
         }
         .layout-live .history-block {
             width: 8cqh; min-width: 2px; height: 100%; border-radius: 2px; opacity: 0.9;
@@ -764,6 +748,12 @@
                     changeLanguage();
                     updateModeBtn(); // ボタン表示更新
                     renderPopupContent();
+                    
+                    // 初期リサイズ
+                    try {
+                        if (isLiveMode) window.resizeTo(866, 210);
+                        else window.resizeTo(436, 396);
+                    } catch(e) {}
                 } catch(e) { console.error(e); }
             }
 
@@ -778,7 +768,7 @@
                     renderPopupContent();
                     // ウィンドウサイズも合わせたいところだが、セキュリティ制限で効かない場合が多い
                     try {
-                        if (isLiveMode) window.resizeTo(1101, 225);
+                        if (isLiveMode) window.resizeTo(866, 210);
                         else window.resizeTo(436, 396);
                     } catch(e) {}
                 }
@@ -1042,9 +1032,10 @@
                 return; 
             }
 
-            // サイズ調整
-            const width = isLiveMode ? 1085 : 420;
-            const height = isLiveMode ? 175 : 336;
+            // サイズ調整: LIVEモード2.5倍、通常モード1.5倍
+            // LIVEモードは幅を広げすぎず、適度な幅に調整
+            const width = isLiveMode ? 850 : 420;
+            const height = isLiveMode ? 160 : 336;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
             
@@ -1084,8 +1075,8 @@
             if (!isPopupWindow) {
                 // 通常モード内のドラッグ可能ポップアップのサイズ調整
                 if (isLiveMode) {
-                    popup.style.width = '1085px';
-                    popup.style.height = '175px';
+                    popup.style.width = '850px';
+                    popup.style.height = '160px';
                 } else {
                     popup.style.width = '420px';
                     popup.style.height = '336px';
@@ -1094,7 +1085,7 @@
                 // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
                 try {
                     // 枠分を適当に考慮
-                    if (isLiveMode) window.resizeTo(1101, 225);
+                    if (isLiveMode) window.resizeTo(866, 210);
                     else window.resizeTo(436, 396);
                 } catch(e) {
                     console.log('Window resize blocked by browser');
@@ -1150,24 +1141,22 @@
 
                 container.innerHTML = `
                     <div class="cq-container layout-live">
-                        <div class="status-wrapper">
-                            ${rankImgHtml}
-                            <div class="cq-content">
-                                <div class="cq-rank-row">
-                                    <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
-                                    <div class="cq-lp-text" style="color: ${color}">${lp} LP</div>
+                        ${rankImgHtml}
+                        <div class="cq-content">
+                            <div class="cq-rank-row">
+                                <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
+                                <div class="cq-lp-text" style="color: ${color}">${lp} LP</div>
+                            </div>
+                            <div class="cq-stats-row">
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #60a5fa">W</div>
+                                    <div class="cq-stat-value">${wins}</div>
                                 </div>
-                                <div class="cq-stats-row">
-                                    <div class="cq-stat-item">
-                                        <div class="cq-stat-label" style="color: #60a5fa">W</div>
-                                        <div class="cq-stat-value">${wins}</div>
-                                    </div>
-                                    <div class="cq-stat-item">
-                                        <div class="cq-stat-label" style="color: #f87171">L</div>
-                                        <div class="cq-stat-value">${losses}</div>
-                                    </div>
-                                    ${historyHtml}
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #f87171">L</div>
+                                    <div class="cq-stat-value">${losses}</div>
                                 </div>
+                                ${historyHtml}
                             </div>
                         </div>
                     </div>
@@ -1175,22 +1164,20 @@
             } else {
                 container.innerHTML = `
                     <div class="cq-container layout-normal">
-                        <div class="status-wrapper">
-                            <div class="section-icon">
-                                ${rankImgHtml}
-                            </div>
-                            <div class="section-info">
-                                <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
-                                <div class="cq-lp-text" style="color: ${color}">${lp} LP</div>
-                                <div class="cq-stats-group">
-                                    <div class="cq-stat-item">
-                                        <div class="cq-stat-label" style="color: #60a5fa">W</div>
-                                        <div class="cq-stat-value">${wins}</div>
-                                    </div>
-                                    <div class="cq-stat-item">
-                                        <div class="cq-stat-label" style="color: #f87171">L</div>
-                                        <div class="cq-stat-value">${losses}</div>
-                                    </div>
+                        <div class="section-icon">
+                            ${rankImgHtml}
+                        </div>
+                        <div class="section-info">
+                            <div class="cq-rank-text" style="color: ${color}">${tier} ${rank}</div>
+                            <div class="cq-lp-text" style="color: ${color}">${lp} LP</div>
+                            <div class="cq-stats-group">
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #60a5fa">W</div>
+                                    <div class="cq-stat-value">${wins}</div>
+                                </div>
+                                <div class="cq-stat-item">
+                                    <div class="cq-stat-label" style="color: #f87171">L</div>
+                                    <div class="cq-stat-value">${losses}</div>
                                 </div>
                             </div>
                         </div>
