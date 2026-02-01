@@ -1117,13 +1117,87 @@
             const container = document.getElementById('popupContentContainer');
             const { tier, rank, lp, wins, losses, history } = currentData;
             
-            let rankImgHtml = '';
-            if (tier !== "UNRANKED") {
-                let imgName = (tier === "IRON") ? "Iron.png" : `${tier.toLowerCase()}.png`;
-                rankImgHtml = `<img src="png/${imgName}" class="cq-rank-icon" alt="${tier}">`;
-            }
+            // 現在の表示モードと一致するか確認
+            const targetLayout = isLiveMode ? 'layout-live' : 'layout-normal';
+            const existingContent = container.querySelector('.cq-container');
+            const isLayoutMatch = existingContent && existingContent.classList.contains(targetLayout);
+            
             const color = getTierColor(tier);
+            let imgName = "";
+            if (tier !== "UNRANKED") {
+                imgName = (tier === "IRON") ? "Iron.png" : `${tier.toLowerCase()}.png`;
+            }
+            const imgSrc = imgName ? `png/${imgName}` : "";
 
+            // レイアウトが一致する場合、DOMの部分更新を行う（ちらつき防止）
+            if (isLayoutMatch) {
+                // ランクテキスト
+                const rankEl = existingContent.querySelector('.cq-rank-text');
+                if (rankEl) {
+                    const newRankText = `${tier} ${rank}`;
+                    if (rankEl.textContent !== newRankText) rankEl.textContent = newRankText;
+                    if (rankEl.style.color !== color) rankEl.style.color = color;
+                }
+                
+                // LP
+                const lpEl = existingContent.querySelector('.cq-lp-text');
+                if (lpEl) {
+                    const newLpText = `${lp} LP`;
+                    if (lpEl.textContent !== newLpText) lpEl.textContent = newLpText;
+                    if (lpEl.style.color !== color) lpEl.style.color = color;
+                }
+                
+                // 画像 (srcの変更がある場合のみ)
+                const imgEl = existingContent.querySelector('.cq-rank-icon');
+                if (imgEl && imgSrc) {
+                    // フルパスと比較になる可能性があるため、ファイル名が含まれているかで判定
+                    if (!imgEl.src.includes(imgName)) {
+                        imgEl.src = imgSrc;
+                        imgEl.alt = tier;
+                    }
+                }
+
+                // 勝敗数 (順番依存: W -> L)
+                const statValues = existingContent.querySelectorAll('.cq-stat-value');
+                if (statValues.length >= 2) {
+                    if (statValues[0].textContent != wins) statValues[0].textContent = wins;
+                    if (statValues[1].textContent != losses) statValues[1].textContent = losses;
+                }
+
+                // 履歴バー (Liveモードのみ)
+                if (isLiveMode) {
+                    let historyBar = existingContent.querySelector('.history-bar');
+                    // 履歴HTML生成
+                    let historyHtml = '';
+                    if (history && history.length > 0) {
+                        history.forEach((isWin, index) => {
+                            const className = isWin ? 'block-win' : 'block-loss';
+                            historyHtml += `<div class="history-block ${className}"></div>`;
+                            if (index < history.length - 1) {
+                                historyHtml += `<div class="history-spacer"></div>`;
+                            }
+                        });
+                    }
+
+                    if (historyBar) {
+                        if (historyBar.innerHTML !== historyHtml) historyBar.innerHTML = historyHtml;
+                    } else if (historyHtml) {
+                        // バーが存在しないが履歴がある場合、stats-rowに追加
+                        const statsRow = existingContent.querySelector('.cq-stats-row');
+                        if (statsRow) {
+                            const newBar = document.createElement('div');
+                            newBar.className = 'history-bar';
+                            newBar.innerHTML = historyHtml;
+                            statsRow.appendChild(newBar);
+                        }
+                    }
+                }
+                return; // 部分更新完了
+            }
+
+            // 完全再描画 (初回 or レイアウト変更時)
+            let rankImgHtml = imgSrc ? `<img src="${imgSrc}" class="cq-rank-icon" alt="${tier}">` : '';
+            
             if (isLiveMode) {
                 let historyHtml = '';
                 if (history && history.length > 0) {
@@ -1131,7 +1205,6 @@
                     history.forEach((isWin, index) => {
                         const className = isWin ? 'block-win' : 'block-loss';
                         historyHtml += `<div class="history-block ${className}"></div>`;
-                        // 最後の要素以外にスペーサーを追加
                         if (index < history.length - 1) {
                             historyHtml += `<div class="history-spacer"></div>`;
                         }
