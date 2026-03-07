@@ -578,14 +578,13 @@
                                     <label class="block text-[10px] text-gray-400 mb-1 ml-1"
                                         data-i18n="lblGameName">Riot ID (Name#Tag)</label>
                                     <input type="text" id="gameName" placeholder="Name#Tag"
-                                        class="w-full glass-input rounded-lg px-4 py-2.5"
-                                        data-i18n-placeholder="phGameName">
+                                        class="w-full glass-input rounded-lg px-4 py-2.5">
                                     <input type="hidden" id="tagLine" value="">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] text-gray-400 mb-1 ml-1"
                                         data-i18n="lblRegion">Region</label>
-                                    <select id="region"
+                                    <select id="region" onchange="updateDynamicInputText()"
                                         class="w-full glass-input rounded-lg px-4 py-2.5 appearance-none cursor-pointer">
                                         <option value="jp1" selected>Japan (JP)</option>
                                         <option value="na1">North America (NA)</option>
@@ -599,6 +598,24 @@
                                     <div id="historyList" class="flex flex-wrap gap-2 mb-2"></div>
                                 </div>
                                 <div class="flex flex-col gap-3 mt-2">
+                                    <div class="w-full">
+                                        <label class="block text-[10px] text-gray-400 mb-1 ml-1"
+                                            data-i18n="lblFont">Font Style</label>
+                                        <select id="fontSelect" onchange="changeFont()"
+                                            class="w-full glass-input rounded-lg px-4 py-2 appearance-none cursor-pointer text-xs">
+                                            <option
+                                                value="'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif">
+                                                Standard</option>
+                                            <option value="'Meiryo', sans-serif">メイリオ (Meiryo)</option>
+                                            <option value="'Yu Gothic', sans-serif">游ゴシック (Yu Gothic)</option>
+                                            <option value="'MS PGothic', sans-serif">MS Pゴシック (MS PGothic)</option>
+                                            <option value="'Yu Mincho', 'MS Mincho', serif">游明朝 (Cool)</option>
+                                            <option value="'HG Maru Gothic M-PRO', 'Comic Sans MS', sans-serif">
+                                                HG丸ｺﾞｼｯｸM-PRO (Cute)</option>
+                                            <option value="'HGP Soei Kakupoptai', sans-serif">HGP創英角ﾎﾟｯﾌﾟ体 (Pop)
+                                            </option>
+                                        </select>
+                                    </div>
                                     <button onclick="startFetch()" id="searchBtn"
                                         class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
                                         <span data-i18n="btnSearch">Fetch Stats</span>
@@ -827,6 +844,17 @@
         let isLiveMode = false;
         let isChromaKey = false;
         let currentStatsColor = localStorage.getItem('lol_stats_color') || '#ffffff';
+        let currentFont = localStorage.getItem('lol_custom_font') || "'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif";
+
+        function changeFont() {
+            const font = document.getElementById('fontSelect').value;
+            currentFont = font;
+            document.body.style.fontFamily = font;
+            localStorage.setItem('lol_custom_font', font);
+            try {
+                broadcastChannel.postMessage({ type: 'changeFont', font: font });
+            } catch (e) { }
+        }
 
         function setStatsColor(color) {
             currentStatsColor = color;
@@ -876,6 +904,7 @@
                 phTagLine: "#タグ",
                 lblRegion: "サーバー",
                 lblHistory: "最近の検索",
+                lblFont: "フォント",
                 lblAutoRefresh: "アクティブ・モニタリング (10分)",
                 btnSearch: "戦績を取得する",
                 btnPopup: "ポップアップで開く",
@@ -912,6 +941,7 @@
                 phTagLine: "#Tag",
                 lblRegion: "Region",
                 lblHistory: "Recent Searches",
+                lblFont: "Font Style",
                 lblAutoRefresh: "Active Monitoring (10m)",
                 btnSearch: "Fetch Stats",
                 btnPopup: "Open Popup Window",
@@ -948,6 +978,7 @@
                 phTagLine: "#태그",
                 lblRegion: "지역",
                 lblHistory: "최근 검색",
+                lblFont: "폰트",
                 lblAutoRefresh: "액티브 모니터링 (10분)",
                 btnSearch: "전적 검색",
                 btnPopup: "팝업 열기",
@@ -984,6 +1015,7 @@
                 phTagLine: "#标签",
                 lblRegion: "服务器",
                 lblHistory: "最近搜索",
+                lblFont: "字体",
                 lblAutoRefresh: "主动监控 (10分钟)",
                 btnSearch: "查询战绩",
                 btnPopup: "悬浮窗显示",
@@ -1039,6 +1071,10 @@
         window.addEventListener('resize', adjustAppScale);
 
         document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.fontFamily = currentFont;
+            const fontSelect = document.getElementById('fontSelect');
+            if (fontSelect) fontSelect.value = currentFont;
+
             if (!isPopupWindow && window.location.protocol === 'file:') {
                 alert(t('alertServerRequired'));
             }
@@ -1074,6 +1110,10 @@
 
                     const lang = parsed.lang || 'ja';
                     document.getElementById('langSelect').value = lang;
+                    const font = parsed.font || "'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif";
+                    document.body.style.fontFamily = font;
+                    currentFont = font;
+
                     changeLanguage();
                     updateModeBtn(); // ボタン表示更新
                     renderPopupContent();
@@ -1100,6 +1140,9 @@
                     document.querySelectorAll('.cq-stat-value').forEach(el => {
                         el.style.color = currentStatsColor;
                     });
+                } else if (event.data.type === 'changeFont') {
+                    document.body.style.fontFamily = event.data.font;
+                    currentFont = event.data.font;
                 }
             };
         }
@@ -1169,6 +1212,36 @@
             });
 
             updateModeBtn();
+            updateDynamicInputText();
+        }
+
+        function updateDynamicInputText() {
+            const lang = document.getElementById('langSelect').value;
+            let tag = document.getElementById('region').value.toUpperCase();
+            if (tag === 'KR') tag = 'KR1';
+
+            let baseName = "Player Name";
+            let hash = "#";
+
+            if (lang === 'ja') {
+                baseName = "プレイヤー名";
+                hash = "#";
+            } else if (lang === 'ko') {
+                baseName = "プレイヤー名";
+                hash = "＃";
+                tag = tag.replace(/[0-9]/g, function (s) {
+                    return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+                });
+            } else if (lang === 'zh') {
+                baseName = "玩家名称";
+            }
+
+            const combinedText = baseName + hash + tag;
+            const gameNameInput = document.getElementById('gameName');
+            const gameNameLabel = document.querySelector('label[data-i18n="lblGameName"]');
+
+            if (gameNameInput) gameNameInput.placeholder = combinedText;
+            if (gameNameLabel) gameNameLabel.innerText = 'Riot ID (' + combinedText + ')';
         }
 
         function saveToHistory(name, tag, region) {
@@ -1370,7 +1443,8 @@
             localStorage.setItem('lol_rank_sync_data', JSON.stringify({
                 data: currentData,
                 isLiveMode: isLiveMode,
-                lang: document.getElementById('langSelect').value
+                lang: document.getElementById('langSelect').value,
+                font: currentFont
             }));
 
             // 新しいウィンドウを開く
