@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
-        
+
         body {
             font-family: 'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif;
             background-color: #0f172a;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
             color: #f8fafc;
             width: 100vw;
             height: 100vh;
@@ -27,11 +28,13 @@
 
         /* ポップアップウィンドウモード用スタイル */
         body.popup-window-mode {
-            background: #0f172a; /* ウィンドウキャプチャ用に背景色を確保 */
+            background: #0f172a;
+            /* ウィンドウキャプチャ用に背景色を確保 */
             background-image: none;
-            overflow: hidden !important; /* スクロールバー完全抑止 */
+            overflow: hidden !important;
+            /* スクロールバー完全抑止 */
         }
-        
+
         body.popup-window-mode #app-scale-wrapper {
             display: none !important;
         }
@@ -54,21 +57,22 @@
         }
 
         body.popup-window-mode #popupHeader {
-            cursor: default; /* ドラッグ不可を示す */
+            cursor: default;
+            /* ドラッグ不可を示す */
         }
-        
+
         body.popup-window-mode .close-btn-icon {
             /* OBS用には不要だが、ウィンドウを閉じるボタンとして機能させるため表示は維持 */
         }
 
         #app-scale-wrapper {
-            width: 1280px;  
-            height: 800px; 
+            width: 1280px;
+            height: 800px;
             position: relative;
             transform-origin: center center;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
         }
 
         #app-scroll-container {
@@ -81,10 +85,22 @@
             position: relative;
         }
 
-        #app-scroll-container::-webkit-scrollbar { width: 8px; }
-        #app-scroll-container::-webkit-scrollbar-track { background: transparent; }
-        #app-scroll-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        #app-scroll-container::-webkit-scrollbar-thumb:hover { background: #475569; }
+        #app-scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #app-scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #app-scroll-container::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        #app-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
 
         .glass-panel {
             background: rgba(30, 41, 59, 0.4);
@@ -99,6 +115,7 @@
             color: white;
             transition: all 0.2s;
         }
+
         .glass-input:focus {
             border-color: #60a5fa;
             box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
@@ -115,11 +132,12 @@
             padding-right: 0.5rem;
             padding-left: 0.25rem;
         }
+
         .history-chip:hover {
             background: rgba(59, 130, 246, 0.2);
             border-color: rgba(59, 130, 246, 0.4);
         }
-        
+
         .favorite-btn {
             display: flex;
             align-items: center;
@@ -127,16 +145,19 @@
             width: 24px;
             height: 24px;
             cursor: pointer;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255, 255, 255, 0.2);
             transition: all 0.2s;
         }
+
         .favorite-btn:hover {
             color: #fbbf24;
             transform: scale(1.1);
         }
+
         .favorite-btn.active {
             color: #fbbf24;
         }
+
         .favorite-btn svg {
             width: 14px;
             height: 14px;
@@ -149,6 +170,7 @@
             align-items: center;
             gap: 0.25rem;
         }
+
         .history-delete-btn {
             display: flex;
             align-items: center;
@@ -156,29 +178,47 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             font-size: 10px;
             line-height: 1;
             transition: all 0.2s;
         }
+
         .history-delete-btn:hover {
             background: rgba(239, 68, 68, 0.2);
             color: #fca5a5;
         }
 
-        .rank-glow { text-shadow: 0 0 20px currentColor; }
-        
+        .rank-glow {
+            text-shadow: 0 0 20px currentColor;
+        }
+
         .loading-dots:after {
             content: '.';
             animation: dots 1.5s steps(5, end) infinite;
         }
+
         @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
+
+            0%,
+            20% {
+                content: '.';
+            }
+
+            40% {
+                content: '..';
+            }
+
+            60% {
+                content: '...';
+            }
+
+            80%,
+            100% {
+                content: '';
+            }
         }
 
         input[type="checkbox"] {
@@ -186,7 +226,7 @@
             width: 16px;
             height: 16px;
         }
-        
+
         #floatingPopup {
             resize: both;
             overflow: hidden;
@@ -201,134 +241,292 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
-        #floatingPopup.hidden { display: none; }
-        
+        #floatingPopup.hidden {
+            display: none;
+        }
+
         #popupHeader {
-            flex-shrink: 0; height: 32px; cursor: move;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 8px; background: rgba(0, 0, 0, 0.4);
+            flex-shrink: 0;
+            height: 32px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8px;
+            background: rgba(0, 0, 0, 0.4);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             user-select: none;
         }
 
         #popupBody {
-            flex-grow: 1; width: 100%; height: calc(100% - 32px);
-            position: relative; overflow: hidden;
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100% - 32px);
+            position: relative;
+            overflow: hidden;
         }
 
-        .cq-container { width: 100%; height: 100%; }
+        .cq-container {
+            width: 100%;
+            height: 100%;
+        }
 
         /* 通常モードのレイアウト */
         .layout-normal {
-            display: flex; flex-direction: column; width: 100%; height: 100%;
-            padding: 2cqh; box-sizing: border-box; align-items: center;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: 2cqh;
+            box-sizing: border-box;
+            align-items: center;
             justify-content: center;
         }
+
         .layout-normal .section-icon {
-            flex: 0 0 40%; display: flex; align-items: center;
-            justify-content: center; width: 100%; overflow: hidden; padding-bottom: 1cqh;
+            flex: 0 0 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            overflow: hidden;
+            padding-bottom: 1cqh;
         }
+
         .layout-normal .cq-rank-icon {
-            height: 100%; width: auto; max-width: 80%;
-            object-fit: contain; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+            height: 100%;
+            width: auto;
+            max-width: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.5));
         }
+
         .layout-normal .section-info {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: flex-start; width: 100%;
-            gap: 0.5cqh; padding-top: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            gap: 0.5cqh;
+            padding-top: 0;
         }
+
         .layout-normal .cq-rank-text {
-            font-size: 14cqh; width: 100%; text-align: center;
-            white-space: nowrap; line-height: 1; font-weight: 900;
+            font-size: 14cqh;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            line-height: 1;
+            font-weight: 900;
             text-shadow: 0 0 10px currentColor;
             margin-bottom: 0.5cqh;
         }
-        .layout-normal .cq-lp-text { 
-            font-size: 14cqh; line-height: 1; font-weight: 900;
+
+        .layout-normal .cq-lp-text {
+            font-size: 14cqh;
+            line-height: 1;
+            font-weight: 900;
             margin-bottom: 2cqh;
             text-shadow: 0 0 10px currentColor;
         }
-        .layout-normal .cq-stats-group { display: flex; align-items: center; gap: 6cqw; }
-        .layout-normal .cq-stat-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .layout-normal .cq-stat-label { font-size: 12cqh; margin-bottom: 0.5cqh; font-weight: bold; line-height: 1; }
-        .layout-normal .cq-stat-value { font-size: 9cqh; font-weight: 800; line-height: 1; color: white; }
+
+        .layout-normal .cq-stats-group {
+            display: flex;
+            align-items: center;
+            gap: 6cqw;
+        }
+
+        .layout-normal .cq-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layout-normal .cq-stat-label {
+            font-size: 12cqh;
+            margin-bottom: 0.5cqh;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .layout-normal .cq-stat-value {
+            font-size: 9cqh;
+            font-weight: 800;
+            line-height: 1;
+            color: white;
+        }
 
         /* LIVEモードのレイアウト */
         .layout-live {
-            display: flex; flex-direction: row; align-items: center;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
             /* 周りにスペースを空け、見えない透明の枠を小さく作成 */
-            padding: 0 10px; background: transparent; gap: 12px;
-            height: 90%; /* 高さ90%に縮小して中央配置 */
-            width: 96%;  /* 幅96%に縮小して中央配置 */
-            margin: auto; /* 上下左右中央 */
+            padding: 0 10px;
+            background: transparent;
+            gap: 12px;
+            height: 90%;
+            /* 高さ90%に縮小して中央配置 */
+            width: 96%;
+            /* 幅96%に縮小して中央配置 */
+            margin: auto;
+            /* 上下左右中央 */
             box-sizing: border-box;
-            justify-content: center; /* 中央寄せ */
+            justify-content: center;
+            /* 中央寄せ */
         }
+
         .layout-live .cq-rank-icon {
             /* 見切れ防止のため少しサイズ調整 */
-            height: 85cqh; width: auto; max-width: 25cqw;
-            object-fit: contain; filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+            height: 85cqh;
+            width: auto;
+            max-width: 25cqw;
+            object-fit: contain;
+            filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
             flex-shrink: 0;
         }
+
         .layout-live .cq-content {
-            display: flex; flex-direction: column; justify-content: center;
-            align-items: flex-start; height: 100%; 
-            flex-grow: 0; /* コンテンツ幅に合わせる */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100%;
+            flex-grow: 0;
+            /* コンテンツ幅に合わせる */
             gap: 3cqh;
         }
-        
+
         .layout-live .cq-rank-row {
-            display: flex; flex-direction: row; align-items: baseline; gap: 8px;
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            gap: 8px;
         }
+
         .layout-live .cq-rank-text {
             /* 見切れ防止のためフォントサイズ調整: 34cqh -> 30cqh */
-            font-size: 30cqh; font-weight: 900; white-space: nowrap;
-            text-shadow: 0 0 10px currentColor; line-height: 1; text-align: left;
+            font-size: 30cqh;
+            font-weight: 900;
+            white-space: nowrap;
+            text-shadow: 0 0 10px currentColor;
+            line-height: 1;
+            text-align: left;
         }
-        .layout-live .cq-lp-text { 
+
+        .layout-live .cq-lp-text {
             /* 見切れ防止のためフォントサイズ調整: 34cqh -> 30cqh */
-            font-size: 30cqh; font-weight: 900; line-height: 1;
+            font-size: 30cqh;
+            font-weight: 900;
+            line-height: 1;
             text-shadow: 0 0 10px currentColor;
         }
 
         .layout-live .cq-stats-row {
-            display: flex; flex-direction: row; align-items: center; gap: 12px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 12px;
         }
-        .layout-live .cq-stat-item { display: flex; align-items: center; gap: 4px; }
+
+        .layout-live .cq-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         /* フォントサイズ微調整 */
-        .layout-live .cq-stat-label { font-size: 18cqh; opacity: 0.9; font-weight: bold; line-height: 1; }
-        .layout-live .cq-stat-value { font-size: 18cqh; color: white; font-weight: 800; line-height: 1; }
+        .layout-live .cq-stat-label {
+            font-size: 18cqh;
+            opacity: 0.9;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .layout-live .cq-stat-value {
+            font-size: 18cqh;
+            color: white;
+            font-weight: 800;
+            line-height: 1;
+        }
 
         .layout-live .history-bar {
-            display: flex; align-items: center; gap: 0;
-            height: 16cqh; margin-left: 5px;
-        }
-        .layout-live .history-block {
-            width: 8cqh; min-width: 2px; height: 100%; border-radius: 2px; opacity: 0.9;
-        }
-        .layout-live .history-spacer {
-            width: 2cqh; height: 100%; background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            height: 16cqh;
+            margin-left: 5px;
         }
 
-        .block-win { background-color: #3b82f6; box-shadow: 0 0 2px rgba(59, 130, 246, 0.4); }
-        .block-loss { background-color: #f87171; box-shadow: 0 0 2px rgba(248, 113, 113, 0.4); }
+        .layout-live .history-block {
+            width: 8cqh;
+            min-width: 2px;
+            height: 100%;
+            border-radius: 2px;
+            opacity: 0.9;
+        }
+
+        .layout-live .history-spacer {
+            width: 2cqh;
+            height: 100%;
+            background: transparent;
+        }
+
+        .block-win {
+            background-color: #3b82f6;
+            box-shadow: 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+
+        .block-loss {
+            background-color: #f87171;
+            box-shadow: 0 0 2px rgba(248, 113, 113, 0.4);
+        }
 
         .btn-live-toggle {
-            font-size: 10px; padding: 3px 10px; background: #2563eb; color: white;
-            border-radius: 4px; border: none; cursor: pointer; transition: all 0.2s;
-            font-weight: bold; letter-spacing: 0.5px;
+            font-size: 10px;
+            padding: 3px 10px;
+            background: #2563eb;
+            color: white;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
-        .btn-live-toggle:hover { background: #1d4ed8; }
-        .btn-live-toggle.active-mode { background: #059669; }
-        .btn-live-toggle.active-mode:hover { background: #047857; }
 
-        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        .btn-live-toggle:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-live-toggle.active-mode {
+            background: #059669;
+        }
+
+        .btn-live-toggle.active-mode:hover {
+            background: #047857;
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div id="app-scale-wrapper">
@@ -336,23 +534,29 @@
             <header class="w-full glass-panel border-b border-white/10 sticky top-0 z-40">
                 <div class="max-w-6xl mx-auto px-4 py-4 flex flex-row items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                         </div>
                         <div class="flex flex-col">
-                            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-blue-100 to-white leading-tight" data-i18n="appTitle">
+                            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-200 via-blue-100 to-white leading-tight"
+                                data-i18n="appTitle">
                                 LoL Rank Checker
                             </h1>
-                            <p class="text-[10px] text-blue-300/80 font-medium tracking-wide uppercase leading-tight" data-i18n="appSubtitle">
+                            <p class="text-[10px] text-blue-300/80 font-medium tracking-wide uppercase leading-tight"
+                                data-i18n="appSubtitle">
                                 Summoner Analytics
                             </p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <select id="langSelect" onchange="changeLanguage()" class="bg-slate-800 text-xs text-slate-300 border border-slate-700 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <select id="langSelect" onchange="changeLanguage()"
+                            class="bg-slate-800 text-xs text-slate-300 border border-slate-700 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500">
                             <option value="ja">🇯🇵 日本語</option>
                             <option value="en">🇺🇸 English</option>
                             <option value="ko">🇰🇷 한국어</option>
@@ -364,24 +568,25 @@
 
             <main class="flex-grow flex flex-col items-center p-4 pt-8 sm:pt-12 relative">
                 <div class="w-full max-w-6xl flex flex-col lg:flex-row gap-8 items-start justify-center">
-                    
+
                     <div class="w-full max-w-lg flex flex-col gap-6">
                         <div class="glass-panel p-6 rounded-2xl shadow-2xl relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500">
+                            </div>
                             <div class="flex flex-col gap-4">
-                                <div class="flex gap-2">
-                                    <div class="w-2/3">
-                                        <label class="block text-[10px] text-gray-400 mb-1 ml-1" data-i18n="lblGameName">Game Name</label>
-                                        <input type="text" id="gameName" placeholder="Name" class="w-full glass-input rounded-lg px-4 py-2.5" data-i18n-placeholder="phGameName">
-                                    </div>
-                                    <div class="w-1/3">
-                                        <label class="block text-[10px] text-gray-400 mb-1 ml-1" data-i18n="lblTagLine">Tag Line</label>
-                                        <input type="text" id="tagLine" placeholder="#Tag" class="w-full glass-input rounded-lg px-4 py-2.5" data-i18n-placeholder="phTagLine">
-                                    </div>
+                                <div class="w-full">
+                                    <label class="block text-[10px] text-gray-400 mb-1 ml-1"
+                                        data-i18n="lblGameName">Riot ID (Name#Tag)</label>
+                                    <input type="text" id="gameName" placeholder="Name#Tag"
+                                        class="w-full glass-input rounded-lg px-4 py-2.5"
+                                        data-i18n-placeholder="phGameName">
+                                    <input type="hidden" id="tagLine" value="">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] text-gray-400 mb-1 ml-1" data-i18n="lblRegion">Region</label>
-                                    <select id="region" class="w-full glass-input rounded-lg px-4 py-2.5 appearance-none cursor-pointer">
+                                    <label class="block text-[10px] text-gray-400 mb-1 ml-1"
+                                        data-i18n="lblRegion">Region</label>
+                                    <select id="region"
+                                        class="w-full glass-input rounded-lg px-4 py-2.5 appearance-none cursor-pointer">
                                         <option value="jp1" selected>Japan (JP)</option>
                                         <option value="na1">North America (NA)</option>
                                         <option value="euw1">Europe West (EUW)</option>
@@ -389,26 +594,39 @@
                                     </select>
                                 </div>
                                 <div id="historyContainer" class="hidden">
-                                    <label class="block text-[10px] text-gray-500 mb-1.5 ml-1" data-i18n="lblHistory">Recent Searches</label>
+                                    <label class="block text-[10px] text-gray-500 mb-1.5 ml-1"
+                                        data-i18n="lblHistory">Recent Searches</label>
                                     <div id="historyList" class="flex flex-wrap gap-2 mb-2"></div>
                                 </div>
                                 <div class="flex flex-col gap-3 mt-2">
-                                    <button onclick="startFetch()" id="searchBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
+                                    <button onclick="startFetch()" id="searchBtn"
+                                        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
                                         <span data-i18n="btnSearch">Fetch Stats</span>
                                     </button>
                                     <div class="flex items-center justify-between px-1">
                                         <label class="flex items-center gap-2 cursor-pointer group">
                                             <div class="relative flex items-center">
-                                                <input type="checkbox" id="autoRefreshToggle" onchange="toggleAutoRefresh()" class="peer sr-only">
-                                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                                <input type="checkbox" id="autoRefreshToggle"
+                                                    onchange="toggleAutoRefresh()" class="peer sr-only">
+                                                <div
+                                                    class="w-9 h-5 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
+                                                </div>
                                             </div>
                                             <div class="flex flex-col">
-                                                <span class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors" data-i18n="lblAutoRefresh">Active Monitoring (10m)</span>
+                                                <span
+                                                    class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors"
+                                                    data-i18n="lblAutoRefresh">Active Monitoring (10m)</span>
                                             </div>
-                                            <span id="timerLabel" class="text-xs text-blue-400 font-mono ml-2 hidden"></span>
+                                            <span id="timerLabel"
+                                                class="text-xs text-blue-400 font-mono ml-2 hidden"></span>
                                         </label>
-                                        <button onclick="toggleFloatingPopup()" class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                                        <button onclick="toggleFloatingPopup()"
+                                            class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                            </svg>
                                             <span data-i18n="btnPopup">Popup Monitor</span>
                                         </button>
                                     </div>
@@ -417,70 +635,104 @@
                         </div>
 
                         <div id="fetchProgress" class="hidden glass-panel p-5 rounded-xl border-white/5">
-                            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest text-center" data-i18n="progressTitle">Analyzing Data</h3>
+                            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest text-center"
+                                data-i18n="progressTitle">Analyzing Data</h3>
                             <div class="space-y-4">
-                                <div id="step-account" class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
-                                    <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">1</div>
-                                    <span class="text-sm font-medium" data-i18n="stepIdentity">Verify Identity (PUUID)</span>
+                                <div id="step-account"
+                                    class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
+                                    <div
+                                        class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">
+                                        1</div>
+                                    <span class="text-sm font-medium" data-i18n="stepIdentity">Verify Identity
+                                        (PUUID)</span>
                                 </div>
-                                <div id="step-league" class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
-                                    <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">2</div>
+                                <div id="step-league"
+                                    class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
+                                    <div
+                                        class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">
+                                        2</div>
                                     <span class="text-sm font-medium" data-i18n="stepRank">Check Rank Tier & LP</span>
                                 </div>
-                                <div id="step-matches" class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
-                                    <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">3</div>
+                                <div id="step-matches"
+                                    class="flex items-center gap-3 text-gray-500 transition-colors duration-300">
+                                    <div
+                                        class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-[10px] status-icon opacity-50">
+                                        3</div>
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-medium" data-i18n="stepMatches">Scan Last 20 Ranked Matches</span>
-                                        <span id="matchCountLabel" class="text-[10px] text-blue-400 font-mono h-4"></span>
+                                        <span class="text-sm font-medium" data-i18n="stepMatches">Scan Last 20 Ranked
+                                            Matches</span>
+                                        <span id="matchCountLabel"
+                                            class="text-[10px] text-blue-400 font-mono h-4"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="errorMsg" class="hidden p-4 bg-red-950/40 border border-red-500/50 text-red-200 rounded-lg text-sm text-center flex flex-col items-center gap-2 backdrop-blur-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <div id="errorMsg"
+                            class="hidden p-4 bg-red-950/40 border border-red-500/50 text-red-200 rounded-lg text-sm text-center flex flex-col items-center gap-2 backdrop-blur-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-400" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
                             <span id="errorText"></span>
                         </div>
                     </div>
 
-                    <div id="resultArea" class="hidden w-full max-w-lg glass-panel p-8 rounded-2xl shadow-2xl text-center border-t border-white/10">
+                    <div id="resultArea"
+                        class="hidden w-full max-w-lg glass-panel p-8 rounded-2xl shadow-2xl text-center border-t border-white/10">
                         <div id="playerInfo" class="animate-fade-in-up">
                             <h2 id="displayName" class="text-3xl font-bold mb-1 text-white tracking-tight"></h2>
                             <div class="flex flex-col items-center mt-6">
                                 <div id="rankIconContainer" class="relative mb-4">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent blur-xl rounded-full"></div>
-                                    <img id="rankIcon" src="png/Iron.png" class="relative w-48 h-48 object-contain drop-shadow-2xl transform hover:scale-110 transition-transform duration-300 select-none" alt="Rank Icon">
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent blur-xl rounded-full">
+                                    </div>
+                                    <img id="rankIcon" src="png/Iron.png"
+                                        class="relative w-48 h-48 object-contain drop-shadow-2xl transform hover:scale-110 transition-transform duration-300 select-none"
+                                        alt="Rank Icon">
                                 </div>
-                                <div id="rankText" class="text-4xl font-black uppercase tracking-wider rank-glow mb-1"></div>
-                                <div id="lpValue" class="text-4xl text-blue-200/80 font-mono bg-blue-900/20 px-4 py-2 rounded-full border border-blue-500/20"></div>
-                                
+                                <div id="rankText" class="text-4xl font-black uppercase tracking-wider rank-glow mb-1">
+                                </div>
+                                <div id="lpValue"
+                                    class="text-4xl text-blue-200/80 font-mono bg-blue-900/20 px-4 py-2 rounded-full border border-blue-500/20">
+                                </div>
+
                                 <div class="mt-8 w-full bg-slate-900/50 rounded-xl p-4 border border-slate-700/50">
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4" data-i18n="lblRecentResults">Last 20 Matches</div>
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4"
+                                        data-i18n="lblRecentResults">Last 20 Matches</div>
                                     <div class="grid grid-cols-2 gap-4 divide-x divide-slate-700/50">
                                         <div class="flex flex-col items-center">
-                                            <span class="text-[10px] text-blue-400 font-bold mb-1" data-i18n="lblWins">WINS</span>
+                                            <span class="text-[10px] text-blue-400 font-bold mb-1"
+                                                data-i18n="lblWins">WINS</span>
                                             <span id="winCount" class="text-2xl font-black text-white">0</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            <span class="text-[10px] text-rose-400 font-bold mb-1" data-i18n="lblLosses">LOSSES</span>
+                                            <span class="text-[10px] text-rose-400 font-bold mb-1"
+                                                data-i18n="lblLosses">LOSSES</span>
                                             <span id="lossCount" class="text-2xl font-black text-white">0</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div id="seasonTotalSection" class="mt-4 w-full bg-slate-800/30 rounded-xl p-4 border border-slate-700/30">
-                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4" data-i18n="lblSeasonTotal">Season Total</div>
+                                <div id="seasonTotalSection"
+                                    class="mt-4 w-full bg-slate-800/30 rounded-xl p-4 border border-slate-700/30">
+                                    <div class="text-[10px] text-slate-400 uppercase font-bold tracking-[0.2em] mb-4"
+                                        data-i18n="lblSeasonTotal">Season Total</div>
                                     <div class="grid grid-cols-3 gap-4 divide-x divide-slate-700/30">
                                         <div class="flex flex-col items-center">
-                                            <span class="text-[10px] text-emerald-500/70 font-bold mb-1" data-i18n="lblWins">WINS</span>
+                                            <span class="text-[10px] text-emerald-500/70 font-bold mb-1"
+                                                data-i18n="lblWins">WINS</span>
                                             <span id="totalWinCount" class="text-xl font-bold text-gray-200">0</span>
                                         </div>
                                         <div class="flex flex-col items-center">
-                                            <span class="text-[10px] text-rose-500/70 font-bold mb-1" data-i18n="lblLosses">LOSSES</span>
+                                            <span class="text-[10px] text-rose-500/70 font-bold mb-1"
+                                                data-i18n="lblLosses">LOSSES</span>
                                             <span id="totalLossCount" class="text-xl font-bold text-gray-200">0</span>
                                         </div>
                                         <div class="flex flex-col items-center justify-center">
-                                            <span class="text-[10px] text-blue-500/70 font-bold mb-1" data-i18n="lblWinRate">WIN RATE</span>
+                                            <span class="text-[10px] text-blue-500/70 font-bold mb-1"
+                                                data-i18n="lblWinRate">WIN RATE</span>
                                             <span id="totalWinRatio" class="text-lg font-bold text-gray-300">0%</span>
                                         </div>
                                     </div>
@@ -498,25 +750,35 @@
     </div>
 
     <!-- Draggable Popup (Shared with Popup Mode) -->
-    <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl" style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 336px;">
+    <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl"
+        style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 336px;">
         <div id="popupHeader">
             <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path
+                        d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
-                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK MONITOR</span>
+                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK
+                    MONITOR</span>
             </div>
             <div class="flex items-center gap-2">
+                <button id="chromakeyBtn" onclick="toggleChromaKey()" class="btn-live-toggle"
+                    style="background:#10b981; margin-right:4px;">CHROMA</button>
                 <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
-                <button onclick="closeFloatingPopup()" class="text-gray-400 hover:text-white transition-colors p-1 popup-close-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 close-btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                <button onclick="closeFloatingPopup()"
+                    class="text-gray-400 hover:text-white transition-colors p-1 popup-close-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 close-btn-icon" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
         </div>
         <div id="popupBody">
-            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm" data-i18n="noData">
+            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm"
+                data-i18n="noData">
                 No Data.
             </div>
         </div>
@@ -524,13 +786,29 @@
 
     <script>
         const MAX_HISTORY = 10;
-        
+
         let refreshTimerId = null;
         let nextRefreshTime = 0;
         const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
         let currentData = null;
         let isLiveMode = false;
+        let isChromaKey = false;
+
+        function toggleChromaKey() {
+            isChromaKey = !isChromaKey;
+            const popupEl = document.getElementById('floatingPopup');
+            const bodyEl = document.getElementById('popupBody');
+            if (isChromaKey) {
+                popupEl.style.background = '#00ff00';
+                popupEl.style.border = 'none';
+                bodyEl.style.background = '#00ff00';
+            } else {
+                popupEl.style.background = 'rgba(15, 23, 42, 0.95)';
+                popupEl.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+                bodyEl.style.background = 'transparent';
+            }
+        }
 
         // URLパラメータでポップアップモード判定
         const urlParams = new URLSearchParams(window.location.search);
@@ -710,17 +988,17 @@
             const windowHeight = window.innerHeight;
             const scaleX = windowWidth / baseWidth;
             const scaleY = windowHeight / baseHeight;
-            const scale = Math.min(scaleX, scaleY); 
+            const scale = Math.min(scaleX, scaleY);
             wrapper.style.transform = `scale(${scale})`;
         }
-        
+
         window.addEventListener('resize', adjustAppScale);
 
         document.addEventListener('DOMContentLoaded', () => {
             if (!isPopupWindow && window.location.protocol === 'file:') {
                 alert(t('alertServerRequired'));
             }
-            
+
             if (isPopupWindow) {
                 // ポップアップモード初期化
                 initPopupMode();
@@ -731,18 +1009,18 @@
                 adjustAppScale();
             }
         });
-        
+
         function initPopupMode() {
             // URLパラメータからlive値を最優先で取得
             const urlLiveParam = urlParams.get('live');
-            
+
             // ローカルストレージから初期データ取得
             const syncedData = localStorage.getItem('lol_rank_sync_data');
             if (syncedData) {
                 try {
                     const parsed = JSON.parse(syncedData);
                     currentData = parsed.data;
-                    
+
                     // URLパラメータがあればそれを優先してモード決定、なければストレージの値
                     if (urlLiveParam !== null) {
                         isLiveMode = (urlLiveParam === '1');
@@ -755,7 +1033,7 @@
                     changeLanguage();
                     updateModeBtn(); // ボタン表示更新
                     renderPopupContent();
-                } catch(e) { console.error(e); }
+                } catch (e) { console.error(e); }
             }
 
             // メインウィンドウからのデータ受信
@@ -771,7 +1049,7 @@
                     try {
                         if (isLiveMode) window.resizeTo(836, 225);
                         else window.resizeTo(436, 396);
-                    } catch(e) {}
+                    } catch (e) { }
                 }
             };
         }
@@ -784,7 +1062,7 @@
 
         function initDraggable() {
             if (isPopupWindow) return; // ポップアップウィンドウではドラッグ不要
-            
+
             const popup = document.getElementById("floatingPopup");
             const header = document.getElementById("popupHeader");
             let isDragging = false;
@@ -798,7 +1076,7 @@
                 const rect = popup.getBoundingClientRect();
                 initialLeft = rect.left;
                 initialTop = rect.top;
-                popup.style.transform = 'none'; 
+                popup.style.transform = 'none';
                 popup.style.left = `${initialLeft}px`;
                 popup.style.top = `${initialTop}px`;
                 document.body.style.userSelect = "none";
@@ -820,7 +1098,7 @@
             const lang = document.getElementById('langSelect').value;
             const texts = i18n[lang] || i18n['en'];
             document.documentElement.lang = lang;
-            
+
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (texts[key]) el.innerText = texts[key];
@@ -845,12 +1123,12 @@
 
         function saveToHistory(name, tag, region) {
             let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
-            
-            const existingIndex = history.findIndex(item => 
-                item.name.toLowerCase() === name.toLowerCase() && 
+
+            const existingIndex = history.findIndex(item =>
+                item.name.toLowerCase() === name.toLowerCase() &&
                 item.tag.toLowerCase() === tag.toLowerCase()
             );
-            
+
             let isFavorite = false;
             if (existingIndex !== -1) {
                 isFavorite = history[existingIndex].isFavorite || false;
@@ -880,29 +1158,29 @@
         function toggleFavorite(name, tag, event) {
             if (event) event.stopPropagation();
             let history = JSON.parse(localStorage.getItem('lol_search_history') || '[]');
-            const index = history.findIndex(item => 
+            const index = history.findIndex(item =>
                 item.name === name && item.tag === tag
             );
 
             if (index !== -1) {
                 history[index].isFavorite = !history[index].isFavorite;
-                
+
                 const item = history[index];
                 history.splice(index, 1);
-                
+
                 const favorites = history.filter(i => i.isFavorite);
                 const regulars = history.filter(i => !i.isFavorite);
-                
+
                 if (item.isFavorite) {
                     favorites.unshift(item);
                 } else {
                     regulars.unshift(item);
                 }
-                
+
                 if (regulars.length > MAX_HISTORY) {
                     regulars = regulars.slice(0, MAX_HISTORY);
                 }
-                
+
                 history = [...favorites, ...regulars];
                 localStorage.setItem('lol_search_history', JSON.stringify(history));
                 renderHistory();
@@ -918,8 +1196,7 @@
         }
 
         function applyHistory(name, tag, region) {
-            document.getElementById('gameName').value = name;
-            document.getElementById('tagLine').value = tag;
+            document.getElementById('gameName').value = name + '#' + tag;
             document.getElementById('region').value = region;
         }
 
@@ -930,7 +1207,7 @@
             list.innerHTML = '';
             if (history.length === 0) { container.classList.add('hidden'); return; }
             container.classList.remove('hidden');
-            
+
             history.forEach(item => {
                 const chip = document.createElement('div');
                 chip.className = 'history-chip text-[10px] text-blue-200 rounded-full';
@@ -939,7 +1216,7 @@
                 const regionEsc = item.region;
                 const isFav = item.isFavorite;
 
-                const starSvg = isFav 
+                const starSvg = isFav
                     ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd" /></svg>`
                     : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>`;
 
@@ -964,7 +1241,7 @@
             if (isChecked) {
                 nextRefreshTime = Date.now() + REFRESH_INTERVAL_MS;
                 refreshTimerId = setInterval(updateTimerAndFetch, 1000);
-                updateTimerAndFetch(); 
+                updateTimerAndFetch();
                 timerLabel.classList.remove('hidden');
             } else {
                 if (refreshTimerId) { clearInterval(refreshTimerId); refreshTimerId = null; }
@@ -984,7 +1261,7 @@
                     await fetchWithRetry(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}`);
                     // 成功(200) = 試合中
                     console.log("[Monitor] Player is currently in game. Skipping refresh.");
-                    return; 
+                    return;
                 } catch (e) {
                     // 404以外はエラーとして中断するが、404（試合中ではない）なら次へ
                     if (e.message.indexOf('404') === -1 && e.message.indexOf(t('errNotFound')) === -1) {
@@ -1028,9 +1305,9 @@
 
         function toggleFloatingPopup() {
             // OBSウィンドウキャプチャ対応のため、別ウィンドウで開くように変更
-            if (!currentData) { 
-                alert(t('alertFetchFirst')); 
-                return; 
+            if (!currentData) {
+                alert(t('alertFetchFirst'));
+                return;
             }
 
             // サイズ調整: LIVEモード2.5倍、通常モード1.5倍
@@ -1038,7 +1315,7 @@
             const height = isLiveMode ? 175 : 336;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
-            
+
             // 現在のデータを同期用に保存
             localStorage.setItem('lol_rank_sync_data', JSON.stringify({
                 data: currentData,
@@ -1049,10 +1326,10 @@
             // 新しいウィンドウを開く
             // liveパラメータを付与して、開いた瞬間のモードを確定させる
             const liveParam = isLiveMode ? '1' : '0';
-            
+
             window.open(
-                `${window.location.pathname}?mode=popup&live=${liveParam}`, 
-                'RankMonitorPopup', 
+                `${window.location.pathname}?mode=popup&live=${liveParam}`,
+                'RankMonitorPopup',
                 `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=no`
             );
         }
@@ -1068,7 +1345,7 @@
         function togglePopupMode() {
             isLiveMode = !isLiveMode;
             updateModeBtn();
-            
+
             // ポップアップウィンドウのサイズ変更はOS/ブラウザ制限があるため、
             // ウィンドウ内のコンテンツ調整のみ行う（Container Queriesがサイズに追従する）
             const popup = document.getElementById('floatingPopup');
@@ -1087,11 +1364,11 @@
                     // 枠分を適当に考慮
                     if (isLiveMode) window.resizeTo(836, 225);
                     else window.resizeTo(436, 396);
-                } catch(e) {
+                } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
             }
-            
+
             renderPopupContent();
 
             // モード変更を他方のウィンドウに通知
@@ -1116,12 +1393,12 @@
             if (!currentData) return;
             const container = document.getElementById('popupContentContainer');
             const { tier, rank, lp, wins, losses, history } = currentData;
-            
+
             // 現在の表示モードと一致するか確認
             const targetLayout = isLiveMode ? 'layout-live' : 'layout-normal';
             const existingContent = container.querySelector('.cq-container');
             const isLayoutMatch = existingContent && existingContent.classList.contains(targetLayout);
-            
+
             const color = getTierColor(tier);
             let imgName = "";
             if (tier !== "UNRANKED") {
@@ -1138,7 +1415,7 @@
                     if (rankEl.textContent !== newRankText) rankEl.textContent = newRankText;
                     if (rankEl.style.color !== color) rankEl.style.color = color;
                 }
-                
+
                 // LP
                 const lpEl = existingContent.querySelector('.cq-lp-text');
                 if (lpEl) {
@@ -1146,7 +1423,7 @@
                     if (lpEl.textContent !== newLpText) lpEl.textContent = newLpText;
                     if (lpEl.style.color !== color) lpEl.style.color = color;
                 }
-                
+
                 // 画像 (srcの変更がある場合のみ)
                 const imgEl = existingContent.querySelector('.cq-rank-icon');
                 if (imgEl && imgSrc) {
@@ -1197,7 +1474,7 @@
 
             // 完全再描画 (初回 or レイアウト変更時)
             let rankImgHtml = imgSrc ? `<img src="${imgSrc}" class="cq-rank-icon" alt="${tier}">` : '';
-            
+
             if (isLiveMode) {
                 let historyHtml = '';
                 if (history && history.length > 0) {
@@ -1260,11 +1537,23 @@
         }
 
         async function startFetch(isAutoRefresh = false) {
-            const nameInput = document.getElementById('gameName').value.trim();
-            const tagInput = document.getElementById('tagLine').value.trim().replace('#', '');
+            const combinedInput = document.getElementById('gameName').value.trim();
+            let nameInput = "";
+            let tagInput = "";
+            if (combinedInput.includes('#')) {
+                const parts = combinedInput.split('#');
+                nameInput = parts[0].trim();
+                tagInput = parts.slice(1).join('#').trim();
+            } else {
+                nameInput = combinedInput;
+                tagInput = "";
+            }
             const region = document.getElementById('region').value;
 
-            if (!nameInput || !tagInput) return;
+            if (!nameInput || !tagInput) {
+                showError("Name#Tag の形式で入力してください。");
+                return;
+            }
 
             if (!isAutoRefresh) {
                 document.getElementById('fetchProgress').classList.remove('hidden');
@@ -1296,7 +1585,7 @@
 
                 const matchesPromise = (async () => {
                     const matchIds = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${accountData.puuid}/ids?start=0&count=20&type=ranked`);
-                    
+
                     let wins = 0, losses = 0;
                     let history = [];
                     let processedCount = 0;
@@ -1306,11 +1595,11 @@
                             const matchData = await fetchWithRetry(`https://${route}.api.riotgames.com/lol/match/v5/matches/${matchId}`);
                             processedCount++;
                             const label = document.getElementById('matchCountLabel');
-                            if(label) label.innerText = `(${processedCount} / ${matchIds.length})`;
+                            if (label) label.innerText = `(${processedCount} / ${matchIds.length})`;
 
                             if (matchData && matchData.info && matchData.info.participants) {
                                 const participant = matchData.info.participants.find(p => p.puuid === accountData.puuid);
-                                if (participant) { 
+                                if (participant) {
                                     return participant.win;
                                 }
                             }
@@ -1323,7 +1612,7 @@
                     });
 
                     const results = await Promise.all(matchPromises);
-                    
+
                     results.forEach(result => {
                         if (result === true) { wins++; history.push(true); }
                         else if (result === false) { losses++; history.push(false); }
@@ -1335,9 +1624,9 @@
 
                 // Wait for both tasks
                 const [leagueData, matchStats] = await Promise.all([leaguePromise, matchesPromise]);
-                
+
                 const soloRank = leagueData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
-                
+
                 currentData = {
                     account: accountData,
                     tier: soloRank ? soloRank.tier : "UNRANKED",
@@ -1351,7 +1640,7 @@
                 };
 
                 displayFinalResults();
-                
+
                 // データ更新をポップアップに通知
                 broadcastChannel.postMessage({
                     type: 'updateData',
@@ -1373,7 +1662,7 @@
 
             try {
                 const response = await fetch(proxiedUrl);
-                
+
                 if (!response.ok) {
                     const errorBody = await response.json().catch(() => ({}));
                     if (response.status === 429) throw new Error(t('errRateLimit'));
@@ -1381,7 +1670,7 @@
                     if (response.status === 404) throw new Error(t('errNotFound'));
                     throw new Error(errorBody.error || `HTTP Error ${response.status}`);
                 }
-                
+
                 return await response.json();
             } catch (err) {
                 console.error("Fetch Error:", err);
@@ -1392,17 +1681,17 @@
         function updateStepUI(id, state) {
             const el = document.getElementById(id);
             const icon = el.querySelector('.status-icon');
-            if (state === 'loading') { 
-                el.classList.add('text-blue-400'); 
+            if (state === 'loading') {
+                el.classList.add('text-blue-400');
                 el.classList.remove('text-green-400');
-                icon.classList.add('loading-dots'); 
+                icon.classList.add('loading-dots');
                 icon.innerText = "";
             }
-            else if (state === 'success') { 
+            else if (state === 'success') {
                 el.classList.remove('text-blue-400');
-                el.classList.add('text-green-400'); 
-                icon.innerText = "✓"; 
-                icon.classList.remove('loading-dots'); 
+                el.classList.add('text-green-400');
+                icon.innerText = "✓";
+                icon.classList.remove('loading-dots');
             }
         }
 
@@ -1421,7 +1710,7 @@
             const data = currentData;
             document.getElementById('resultArea').classList.remove('hidden');
             document.getElementById('fetchProgress').classList.add('hidden');
-            
+
             document.getElementById('displayName').innerText = `${data.account.gameName} #${data.account.tagLine}`;
             document.getElementById('winCount').innerText = data.wins;
             document.getElementById('lossCount').innerText = data.losses;
@@ -1432,7 +1721,7 @@
             lpEl.innerText = `${data.lp} LP`;
             lpEl.style.color = color;
             lpEl.style.textShadow = '0 0 10px currentColor';
-            
+
             const iconContainer = document.getElementById('rankIconContainer');
             if (data.tier === "UNRANKED") {
                 iconContainer.classList.add('hidden');
@@ -1441,12 +1730,12 @@
                 let imgName = (data.tier === "IRON") ? "Iron.png" : `${data.tier.toLowerCase()}.png`;
                 document.getElementById('rankIcon').src = `png/${imgName}`;
             }
-            
+
             document.getElementById('totalWinCount').innerText = data.totalWins;
             document.getElementById('totalLossCount').innerText = data.totalLosses;
             const total = data.totalWins + data.totalLosses;
             document.getElementById('totalWinRatio').innerText = total > 0 ? Math.round((data.totalWins / total) * 100) + '%' : '0%';
-            
+
             const now = new Date();
             document.getElementById('lastUpdatedLabel').innerText = `Last Updated: ${now.toLocaleTimeString()}`;
         }
@@ -1462,13 +1751,13 @@
             document.getElementById('fetchProgress').classList.add('hidden');
         }
 
-        (function() {
+        (function () {
             const originalFetch = window.fetchWithRetry;
             const RATE_LIMIT = 115;
             const TIME_WINDOW = 60000;
             const requestTimestamps = [];
 
-            window.fetchWithRetry = async function(url) {
+            window.fetchWithRetry = async function (url) {
                 const now = Date.now();
                 while (requestTimestamps.length > 0 && requestTimestamps[0] <= now - TIME_WINDOW) {
                     requestTimestamps.shift();
@@ -1477,7 +1766,7 @@
                 if (requestTimestamps.length >= RATE_LIMIT) {
                     const oldestTimestamp = requestTimestamps[0];
                     const waitTime = (oldestTimestamp + TIME_WINDOW) - now + 100;
-                    
+
                     if (waitTime > 0) {
                         console.log(`[Rate Limiter] Limit reached. Waiting ${waitTime}ms before next request...`);
                         await new Promise(resolve => setTimeout(resolve, waitTime));
@@ -1488,9 +1777,10 @@
                 requestTimestamps.push(Date.now());
                 return originalFetch(url);
             };
-            
+
             console.log("API Rate Limiter initialized: Max 115 req/min");
         })();
     </script>
 </body>
+
 </html>
