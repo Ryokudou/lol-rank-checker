@@ -763,6 +763,18 @@
                     MONITOR</span>
             </div>
             <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1 mr-1">
+                    <button class="w-3.5 h-3.5 rounded-full border border-white/20 hover:scale-110 transition-transform"
+                        style="background:#ffffff;" onclick="setStatsColor('#ffffff')" title="White"></button>
+                    <button class="w-3.5 h-3.5 rounded-full border border-white/20 hover:scale-110 transition-transform"
+                        style="background:#fde047;" onclick="setStatsColor('#fde047')" title="Yellow"></button>
+                    <button class="w-3.5 h-3.5 rounded-full border border-white/20 hover:scale-110 transition-transform"
+                        style="background:#38bdf8;" onclick="setStatsColor('#38bdf8')" title="Blue"></button>
+                    <button class="w-3.5 h-3.5 rounded-full border border-white/20 hover:scale-110 transition-transform"
+                        style="background:#f87171;" onclick="setStatsColor('#f87171')" title="Red"></button>
+                    <button class="w-3.5 h-3.5 rounded-full border border-white/20 hover:scale-110 transition-transform"
+                        style="background:#a78bfa;" onclick="setStatsColor('#a78bfa')" title="Purple"></button>
+                </div>
                 <button id="chromakeyBtn" onclick="toggleChromaKey()" class="btn-live-toggle"
                     style="background:#10b981; margin-right:4px;">CHROMA</button>
                 <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
@@ -794,6 +806,18 @@
         let currentData = null;
         let isLiveMode = false;
         let isChromaKey = false;
+        let currentStatsColor = localStorage.getItem('lol_stats_color') || '#ffffff';
+
+        function setStatsColor(color) {
+            currentStatsColor = color;
+            localStorage.setItem('lol_stats_color', color);
+            document.querySelectorAll('.cq-stat-value').forEach(el => {
+                el.style.color = color;
+            });
+            try {
+                broadcastChannel.postMessage({ type: 'changeColor', color: color });
+            } catch (e) { }
+        }
 
         function toggleChromaKey() {
             isChromaKey = !isChromaKey;
@@ -826,9 +850,9 @@
             ja: {
                 appTitle: "LoLランクチェッカー",
                 appSubtitle: "サモナー戦績分析",
-                lblGameName: "サモナー名",
+                lblGameName: "プレイヤー名#JP",
                 lblTagLine: "タグライン",
-                phGameName: "サモナー名",
+                phGameName: "プレイヤー名#JP",
                 phTagLine: "#タグ",
                 lblRegion: "サーバー",
                 lblHistory: "最近の検索",
@@ -898,9 +922,9 @@
             ko: {
                 appTitle: "LoL 랭크 체커",
                 appSubtitle: "소환사 전적 분석",
-                lblGameName: "소환사 이름",
+                lblGameName: "プレイヤー名＃KR１",
                 lblTagLine: "태그",
-                phGameName: "소환사 이름",
+                phGameName: "プレイヤー名＃KR１",
                 phTagLine: "#태그",
                 lblRegion: "지역",
                 lblHistory: "최근 검색",
@@ -1050,6 +1074,12 @@
                         if (isLiveMode) window.resizeTo(836, 225);
                         else window.resizeTo(436, 396);
                     } catch (e) { }
+                } else if (event.data.type === 'changeColor') {
+                    currentStatsColor = event.data.color;
+                    localStorage.setItem('lol_stats_color', currentStatsColor);
+                    document.querySelectorAll('.cq-stat-value').forEach(el => {
+                        el.style.color = currentStatsColor;
+                    });
                 }
             };
         }
@@ -1439,6 +1469,8 @@
                 if (statValues.length >= 2) {
                     if (statValues[0].textContent != wins) statValues[0].textContent = wins;
                     if (statValues[1].textContent != losses) statValues[1].textContent = losses;
+                    statValues[0].style.color = currentStatsColor;
+                    statValues[1].style.color = currentStatsColor;
                 }
 
                 // 履歴バー (Liveモードのみ)
@@ -1500,11 +1532,11 @@
                             <div class="cq-stats-row">
                                 <div class="cq-stat-item">
                                     <div class="cq-stat-label" style="color: #60a5fa">W</div>
-                                    <div class="cq-stat-value">${wins}</div>
+                                    <div class="cq-stat-value" style="color: ${currentStatsColor}">${wins}</div>
                                 </div>
                                 <div class="cq-stat-item">
                                     <div class="cq-stat-label" style="color: #f87171">L</div>
-                                    <div class="cq-stat-value">${losses}</div>
+                                    <div class="cq-stat-value" style="color: ${currentStatsColor}">${losses}</div>
                                 </div>
                                 ${historyHtml}
                             </div>
@@ -1523,11 +1555,11 @@
                             <div class="cq-stats-group">
                                 <div class="cq-stat-item">
                                     <div class="cq-stat-label" style="color: #60a5fa">W</div>
-                                    <div class="cq-stat-value">${wins}</div>
+                                    <div class="cq-stat-value" style="color: ${currentStatsColor}">${wins}</div>
                                 </div>
                                 <div class="cq-stat-item">
                                     <div class="cq-stat-label" style="color: #f87171">L</div>
-                                    <div class="cq-stat-value">${losses}</div>
+                                    <div class="cq-stat-value" style="color: ${currentStatsColor}">${losses}</div>
                                 </div>
                             </div>
                         </div>
