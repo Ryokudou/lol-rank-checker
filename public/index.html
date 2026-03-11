@@ -669,23 +669,31 @@
                                                 class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1.5">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                                                 </svg>
                                                 <span data-i18n="btnPopup">Popup Monitor</span>
                                             </button>
                                         </div>
-                                        
+
                                         <div class="flex justify-end mt-1 px-1">
-                                            <button onclick="document.getElementById('obsGuide').classList.toggle('hidden')" 
-                                                    class="text-[10px] text-gray-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+                                            <button
+                                                onclick="document.getElementById('obsGuide').classList.toggle('hidden')"
+                                                class="text-[10px] text-gray-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
                                                 OBSを使ってクロマキー以外で透過する場合
                                             </button>
                                         </div>
-                                        <div id="obsGuide" class="hidden relative p-3 bg-slate-800/80 border border-slate-600/50 rounded-lg text-xs text-gray-300 shadow-inner">
-                                            <button onclick="document.getElementById('obsGuide').classList.add('hidden')" 
-                                                    class="absolute top-1.5 right-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors hover:bg-slate-700">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        <div id="obsGuide"
+                                            class="hidden relative p-3 bg-slate-800/80 border border-slate-600/50 rounded-lg text-xs text-gray-300 shadow-inner">
+                                            <button
+                                                onclick="document.getElementById('obsGuide').classList.add('hidden')"
+                                                class="absolute top-1.5 right-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors hover:bg-slate-700">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
                                             </button>
                                             <p class="pr-5 leading-relaxed">
                                                 Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURLをブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。
@@ -825,6 +833,16 @@
                     MONITOR</span>
             </div>
             <div class="flex items-center gap-2">
+                <div id="popupAutoRefreshContainer" class="hidden flex items-center mr-1">
+                    <label class="flex items-center gap-1 cursor-pointer group mb-0">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" id="popupAutoRefreshToggle" onchange="syncAutoRefreshToggle(this)" class="peer sr-only">
+                            <div class="w-7 h-4 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-300 whitespace-nowrap">10分更新</span>
+                    </label>
+                    <span id="popupTimerLabel" class="text-[10px] text-blue-400 font-mono ml-1 hidden"></span>
+                </div>
                 <div class="flex items-center gap-1 mr-1">
                     <button id="colorToggleBtn"
                         onclick="document.getElementById('colorPickerPalette').classList.toggle('hidden')"
@@ -1142,6 +1160,16 @@
                 changeLanguage();
                 initDraggable();
                 adjustAppScale();
+
+                broadcastChannel.onmessage = (event) => {
+                    if (event.data.type === 'toggleAutoRefresh') {
+                        const mainToggle = document.getElementById('autoRefreshToggle');
+                        if (mainToggle && mainToggle.checked !== event.data.isChecked) {
+                            mainToggle.checked = event.data.isChecked;
+                            toggleAutoRefresh();
+                        }
+                    }
+                };
             }
         });
 
@@ -1168,6 +1196,11 @@
                     const font = parsed.font || "'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif";
                     document.body.style.fontFamily = font;
                     currentFont = font;
+
+                    const popupToggle = document.getElementById('popupAutoRefreshToggle');
+                    if (popupToggle && parsed.isAutoRefreshChecked) {
+                        popupToggle.checked = true;
+                    }
 
                     changeLanguage();
                     updateModeBtn(); // ボタン表示更新
@@ -1198,6 +1231,23 @@
                 } else if (event.data.type === 'changeFont') {
                     document.body.style.fontFamily = event.data.font;
                     currentFont = event.data.font;
+                } else if (event.data.type === 'autoRefreshState') {
+                    const popupToggle = document.getElementById('popupAutoRefreshToggle');
+                    if (popupToggle) popupToggle.checked = event.data.isChecked;
+                    const popupTimerLabel = document.getElementById('popupTimerLabel');
+                    if (!event.data.isChecked && popupTimerLabel) {
+                        popupTimerLabel.classList.add('hidden');
+                    }
+                } else if (event.data.type === 'timerTick') {
+                    const popupTimerLabel = document.getElementById('popupTimerLabel');
+                    if (popupTimerLabel) {
+                        if (event.data.timerText) {
+                            popupTimerLabel.classList.remove('hidden');
+                            popupTimerLabel.innerText = event.data.timerText;
+                        } else {
+                            popupTimerLabel.classList.add('hidden');
+                        }
+                    }
                 }
             };
         }
@@ -1412,19 +1462,42 @@
             });
         }
 
+        function syncAutoRefreshToggle(el) {
+            const isChecked = el.checked;
+            if (isPopupWindow) {
+                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) {}
+            } else {
+                const mainToggle = document.getElementById('autoRefreshToggle');
+                if (mainToggle) mainToggle.checked = isChecked;
+                toggleAutoRefresh();
+            }
+        }
+
         function toggleAutoRefresh() {
             const isChecked = document.getElementById('autoRefreshToggle').checked;
             const timerLabel = document.getElementById('timerLabel');
+
+            const popupToggle = document.getElementById('popupAutoRefreshToggle');
+            if (popupToggle) popupToggle.checked = isChecked;
 
             if (isChecked) {
                 nextRefreshTime = Date.now() + REFRESH_INTERVAL_MS;
                 refreshTimerId = setInterval(updateTimerAndFetch, 1000);
                 updateTimerAndFetch();
                 timerLabel.classList.remove('hidden');
+                try { broadcastChannel.postMessage({ type: 'autoRefreshState', isChecked: true }); } catch(e){}
             } else {
                 if (refreshTimerId) { clearInterval(refreshTimerId); refreshTimerId = null; }
                 timerLabel.classList.add('hidden');
                 timerLabel.innerText = '';
+                
+                const pt = document.getElementById('popupTimerLabel');
+                if (pt) pt.classList.add('hidden');
+                
+                try { 
+                    broadcastChannel.postMessage({ type: 'autoRefreshState', isChecked: false });
+                    broadcastChannel.postMessage({ type: 'timerTick', timerText: '' }); 
+                } catch(e){}
             }
         }
 
@@ -1468,17 +1541,23 @@
         function updateTimerAndFetch() {
             const now = Date.now();
             const diff = nextRefreshTime - now;
-
+            
+            let timerText = '';
             if (diff <= 0) {
                 checkStatusAndRefresh();
                 nextRefreshTime = now + REFRESH_INTERVAL_MS;
                 const m = Math.floor(REFRESH_INTERVAL_MS / 60000);
-                document.getElementById('timerLabel').innerText = `(${m}:00)`;
+                timerText = `(${m}:00)`;
             } else {
                 const m = Math.floor(diff / 60000);
                 const s = Math.floor((diff % 60000) / 1000);
-                document.getElementById('timerLabel').innerText = `(${m}:${s.toString().padStart(2, '0')})`;
+                timerText = `(${m}:${s.toString().padStart(2, '0')})`;
             }
+            
+            document.getElementById('timerLabel').innerText = timerText;
+            const pt = document.getElementById('popupTimerLabel');
+            if (pt) { pt.innerText = timerText; pt.classList.remove('hidden'); }
+            try { broadcastChannel.postMessage({ type: 'timerTick', timerText: timerText }); } catch(e){}
         }
 
         function toggleFloatingPopup() {
@@ -1495,11 +1574,13 @@
             const top = (screen.height - height) / 2;
 
             // 現在のデータを同期用に保存
+            const mainToggle = document.getElementById('autoRefreshToggle');
             localStorage.setItem('lol_rank_sync_data', JSON.stringify({
                 data: currentData,
                 isLiveMode: isLiveMode,
                 lang: document.getElementById('langSelect').value,
-                font: currentFont
+                font: currentFont,
+                isAutoRefreshChecked: mainToggle ? mainToggle.checked : false
             }));
 
             // 新しいウィンドウを開く
@@ -1559,12 +1640,15 @@
 
         function updateModeBtn() {
             const btn = document.getElementById('modeToggleBtn');
+            const popupRefreshContainer = document.getElementById('popupAutoRefreshContainer');
             if (isLiveMode) {
                 btn.innerText = t('liveModeOn');
                 btn.classList.add('active-mode');
+                if (popupRefreshContainer) popupRefreshContainer.classList.remove('hidden');
             } else {
                 btn.innerText = t('liveModeOff');
                 btn.classList.remove('active-mode');
+                if (popupRefreshContainer) popupRefreshContainer.classList.add('hidden');
             }
         }
 
