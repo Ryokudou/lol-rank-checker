@@ -258,12 +258,8 @@
         }
 
         #floatingPopup.transparent-mode #popupHeader {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        #floatingPopup.transparent-mode:hover #popupHeader {
-            opacity: 1;
+            background: transparent !important;
+            border-bottom: none !important;
         }
 
         #floatingPopup.transparent-mode #popupBody {
@@ -885,8 +881,14 @@
             const popupEl = document.getElementById('floatingPopup');
             if (isTransparentMode) {
                 popupEl.classList.add('transparent-mode');
+                if (document.body.classList.contains('popup-window-mode')) {
+                    document.body.style.background = 'transparent';
+                }
             } else {
                 popupEl.classList.remove('transparent-mode');
+                if (document.body.classList.contains('popup-window-mode')) {
+                    document.body.style.background = isChromaKey ? '#00ff00' : '#0f172a';
+                }
             }
         }
 
@@ -898,10 +900,16 @@
                 popupEl.style.background = '#00ff00';
                 popupEl.style.border = 'none';
                 bodyEl.style.background = '#00ff00';
+                if (document.body.classList.contains('popup-window-mode')) {
+                    document.body.style.background = '#00ff00';
+                }
             } else {
                 popupEl.style.background = 'rgba(15, 23, 42, 0.95)';
                 popupEl.style.border = '1px solid rgba(255, 255, 255, 0.15)';
                 bodyEl.style.background = 'transparent';
+                if (document.body.classList.contains('popup-window-mode')) {
+                    document.body.style.background = isTransparentMode ? 'transparent' : '#0f172a';
+                }
             }
         }
 
