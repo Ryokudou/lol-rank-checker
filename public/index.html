@@ -1961,6 +1961,20 @@
 
             console.log("API Rate Limiter initialized: Max 115 req/min");
         })();
+
+        // ネットワーク再接続（スリープ復帰など）時の自動更新
+        window.addEventListener('online', () => {
+            console.log("[Monitor] Network is back online. Resuming data sync.");
+            if (currentData && currentData.account) {
+                // ポップアップウィンドウは別画面でデータを受け取るだけなので、
+                // メインウィンドウ側でのみ再取得処理をキックする
+                if (!isPopupWindow) {
+                    console.log("[Monitor] Forcing data refresh after coming online.");
+                    // 裏側でフェッチを実行して、メインとポップアップ両方の表示を更新
+                    startFetch(true);
+                }
+            }
+        });
     </script>
 </body>
 
