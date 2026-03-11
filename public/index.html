@@ -245,6 +245,23 @@
             display: none;
         }
 
+        #floatingPopup.transparent-mode {
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        #floatingPopup.transparent-mode #popupHeader {
+            background: transparent !important;
+            border-bottom: none !important;
+        }
+
+        #floatingPopup.transparent-mode #popupBody {
+            background: transparent !important;
+        }
+
         #popupHeader {
             flex-shrink: 0;
             height: 32px;
@@ -797,6 +814,8 @@
                             title="Black"></button>
                     </div>
                 </div>
+                <button id="transparentBtn" onclick="toggleTransparentMode()" class="btn-live-toggle"
+                    style="background:#8b5cf6; margin-right:4px;">透過</button>
                 <button id="chromakeyBtn" onclick="toggleChromaKey()" class="btn-live-toggle"
                     style="background:#10b981; margin-right:4px;">CHROMA</button>
                 <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
@@ -850,6 +869,17 @@
             try {
                 broadcastChannel.postMessage({ type: 'changeColor', color: color });
             } catch (e) { }
+        }
+
+        let isTransparentMode = false;
+        function toggleTransparentMode() {
+            isTransparentMode = !isTransparentMode;
+            const popupEl = document.getElementById('floatingPopup');
+            if (isTransparentMode) {
+                popupEl.classList.add('transparent-mode');
+            } else {
+                popupEl.classList.remove('transparent-mode');
+            }
         }
 
         function toggleChromaKey() {
