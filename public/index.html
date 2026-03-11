@@ -647,32 +647,50 @@
                                         class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98]">
                                         <span data-i18n="btnSearch">Fetch Stats</span>
                                     </button>
-                                    <div class="flex items-center justify-between px-1">
-                                        <label class="flex items-center gap-2 cursor-pointer group">
-                                            <div class="relative flex items-center">
-                                                <input type="checkbox" id="autoRefreshToggle"
-                                                    onchange="toggleAutoRefresh()" class="peer sr-only">
-                                                <div
-                                                    class="w-9 h-5 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
+                                    <div class="flex flex-col gap-2">
+                                        <div class="flex items-center justify-between px-1">
+                                            <label class="flex items-center gap-2 cursor-pointer group">
+                                                <div class="relative flex items-center">
+                                                    <input type="checkbox" id="autoRefreshToggle"
+                                                        onchange="toggleAutoRefresh()" class="peer sr-only">
+                                                    <div
+                                                        class="w-9 h-5 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span
-                                                    class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors"
-                                                    data-i18n="lblAutoRefresh">Active Monitoring (10m)</span>
-                                            </div>
-                                            <span id="timerLabel"
-                                                class="text-xs text-blue-400 font-mono ml-2 hidden"></span>
-                                        </label>
-                                        <button onclick="toggleFloatingPopup()"
-                                            class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                            </svg>
-                                            <span data-i18n="btnPopup">Popup Monitor</span>
-                                        </button>
+                                                <div class="flex flex-col">
+                                                    <span
+                                                        class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors"
+                                                        data-i18n="lblAutoRefresh">Active Monitoring (10m)</span>
+                                                </div>
+                                                <span id="timerLabel"
+                                                    class="text-xs text-blue-400 font-mono ml-2 hidden"></span>
+                                            </label>
+                                            <button onclick="toggleFloatingPopup()"
+                                                class="text-xs bg-slate-800 hover:bg-slate-700 text-blue-300 hover:text-white px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                                </svg>
+                                                <span data-i18n="btnPopup">Popup Monitor</span>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="flex justify-end mt-1 px-1">
+                                            <button onclick="document.getElementById('obsGuide').classList.toggle('hidden')" 
+                                                    class="text-[10px] text-gray-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+                                                OBSを使ってクロマキー以外で透過する場合
+                                            </button>
+                                        </div>
+                                        <div id="obsGuide" class="hidden relative p-3 bg-slate-800/80 border border-slate-600/50 rounded-lg text-xs text-gray-300 shadow-inner">
+                                            <button onclick="document.getElementById('obsGuide').classList.add('hidden')" 
+                                                    class="absolute top-1.5 right-1.5 text-gray-400 hover:text-white p-1 rounded transition-colors hover:bg-slate-700">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            </button>
+                                            <p class="pr-5 leading-relaxed">
+                                                Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURLをブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
