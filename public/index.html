@@ -253,9 +253,17 @@
             box-shadow: none !important;
         }
 
+        #floatingPopup.transparent-mode::-webkit-resizer {
+            display: none;
+        }
+
         #floatingPopup.transparent-mode #popupHeader {
-            background: transparent !important;
-            border-bottom: none !important;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #floatingPopup.transparent-mode:hover #popupHeader {
+            opacity: 1;
         }
 
         #floatingPopup.transparent-mode #popupBody {
