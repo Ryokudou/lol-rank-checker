@@ -887,6 +887,7 @@
 
         let refreshTimerId = null;
         let nextRefreshTime = 0;
+        let lastTickTime = 0;
         const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 
         let currentData = null;
@@ -1470,6 +1471,7 @@
 
             if (isChecked) {
                 nextRefreshTime = Date.now() + REFRESH_INTERVAL_MS;
+                lastTickTime = Date.now();
                 refreshTimerId = setInterval(updateTimerAndFetch, 1000);
                 updateTimerAndFetch();
                 timerLabel.classList.remove('hidden');
@@ -1535,6 +1537,14 @@
 
         function updateTimerAndFetch() {
             const now = Date.now();
+            
+            // スリープからの復帰検知 (1秒ごとのTickが10秒以上遅れた場合)
+            if (lastTickTime !== 0 && (now - lastTickTime) > 10000) {
+                console.log("[Monitor] Woke up from sleep. Forcing immediate refresh.");
+                nextRefreshTime = now; // 強制的に即時更新
+            }
+            lastTickTime = now;
+
             const diff = nextRefreshTime - now;
             
             let timerText = '';
