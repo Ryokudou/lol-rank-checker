@@ -839,9 +839,8 @@
                             <input type="checkbox" id="popupAutoRefreshToggle" onchange="syncAutoRefreshToggle(this)" class="peer sr-only">
                             <div class="w-7 h-4 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-300 whitespace-nowrap">10分更新</span>
+                        <span id="popupTimerLabel" class="text-[10px] font-bold text-gray-300 whitespace-nowrap">10分更新</span>
                     </label>
-                    <span id="popupTimerLabel" class="text-[10px] text-blue-400 font-mono ml-1 hidden"></span>
                 </div>
                 <div class="flex items-center gap-1 mr-1">
                     <button id="colorToggleBtn"
@@ -1197,6 +1196,15 @@
                     document.body.style.fontFamily = font;
                     currentFont = font;
 
+                    if (currentData && currentData.account) {
+                        const gnInput = document.getElementById('gameName');
+                        if (gnInput) gnInput.value = currentData.account.gameName + '#' + currentData.account.tagLine;
+                    }
+                    if (parsed.region) {
+                        const regInput = document.getElementById('region');
+                        if (regInput) regInput.value = parsed.region;
+                    }
+
                     const popupToggle = document.getElementById('popupAutoRefreshToggle');
                     if (popupToggle && parsed.isAutoRefreshChecked) {
                         popupToggle.checked = true;
@@ -1231,23 +1239,6 @@
                 } else if (event.data.type === 'changeFont') {
                     document.body.style.fontFamily = event.data.font;
                     currentFont = event.data.font;
-                } else if (event.data.type === 'autoRefreshState') {
-                    const popupToggle = document.getElementById('popupAutoRefreshToggle');
-                    if (popupToggle) popupToggle.checked = event.data.isChecked;
-                    const popupTimerLabel = document.getElementById('popupTimerLabel');
-                    if (!event.data.isChecked && popupTimerLabel) {
-                        popupTimerLabel.classList.add('hidden');
-                    }
-                } else if (event.data.type === 'timerTick') {
-                    const popupTimerLabel = document.getElementById('popupTimerLabel');
-                    if (popupTimerLabel) {
-                        if (event.data.timerText) {
-                            popupTimerLabel.classList.remove('hidden');
-                            popupTimerLabel.innerText = event.data.timerText;
-                        } else {
-                            popupTimerLabel.classList.add('hidden');
-                        }
-                    }
                 }
             };
         }
@@ -1464,13 +1455,10 @@
 
         function syncAutoRefreshToggle(el) {
             const isChecked = el.checked;
-            if (isPopupWindow) {
-                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) {}
-            } else {
-                const mainToggle = document.getElementById('autoRefreshToggle');
-                if (mainToggle) mainToggle.checked = isChecked;
-                toggleAutoRefresh();
-            }
+            const mainToggle = document.getElementById('autoRefreshToggle');
+            if (mainToggle) mainToggle.checked = isChecked;
+            toggleAutoRefresh();
+            try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) {}
         }
 
         function toggleAutoRefresh() {
@@ -1485,24 +1473,31 @@
                 refreshTimerId = setInterval(updateTimerAndFetch, 1000);
                 updateTimerAndFetch();
                 timerLabel.classList.remove('hidden');
-                try { broadcastChannel.postMessage({ type: 'autoRefreshState', isChecked: true }); } catch(e){}
             } else {
                 if (refreshTimerId) { clearInterval(refreshTimerId); refreshTimerId = null; }
                 timerLabel.classList.add('hidden');
                 timerLabel.innerText = '';
                 
                 const pt = document.getElementById('popupTimerLabel');
-                if (pt) pt.classList.add('hidden');
-                
-                try { 
-                    broadcastChannel.postMessage({ type: 'autoRefreshState', isChecked: false });
-                    broadcastChannel.postMessage({ type: 'timerTick', timerText: '' }); 
-                } catch(e){}
+                if (pt) {
+                    pt.innerText = '10分更新';
+                    pt.classList.remove('text-blue-400', 'font-mono');
+                    pt.classList.add('text-gray-300');
+                }
             }
         }
 
         async function checkStatusAndRefresh() {
             if (!currentData || !currentData.account) return;
+            
+            const now = Date.now();
+            const lastCheck = parseInt(localStorage.getItem('lol_last_refresh') || '0', 10);
+            if (now - lastCheck < 30000) {
+                console.log("[Monitor] Checked recently by another instance. Skipping.");
+                return;
+            }
+            localStorage.setItem('lol_last_refresh', now.toString());
+
             const puuid = currentData.account.puuid;
             const region = document.getElementById('region').value;
 
@@ -1556,8 +1551,11 @@
             
             document.getElementById('timerLabel').innerText = timerText;
             const pt = document.getElementById('popupTimerLabel');
-            if (pt) { pt.innerText = timerText; pt.classList.remove('hidden'); }
-            try { broadcastChannel.postMessage({ type: 'timerTick', timerText: timerText }); } catch(e){}
+            if (pt) {
+                pt.innerText = timerText;
+                pt.classList.add('text-blue-400', 'font-mono');
+                pt.classList.remove('text-gray-300');
+            }
         }
 
         function toggleFloatingPopup() {
@@ -1575,11 +1573,13 @@
 
             // 現在のデータを同期用に保存
             const mainToggle = document.getElementById('autoRefreshToggle');
+            const regionVal = document.getElementById('region').value;
             localStorage.setItem('lol_rank_sync_data', JSON.stringify({
                 data: currentData,
                 isLiveMode: isLiveMode,
                 lang: document.getElementById('langSelect').value,
                 font: currentFont,
+                region: regionVal,
                 isAutoRefreshChecked: mainToggle ? mainToggle.checked : false
             }));
 
