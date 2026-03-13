@@ -1540,8 +1540,17 @@
             
             // スリープからの復帰検知 (1秒ごとのTickが10秒以上遅れた場合)
             if (lastTickTime !== 0 && (now - lastTickTime) > 10000) {
-                console.log("[Monitor] Woke up from sleep. Forcing immediate refresh.");
-                nextRefreshTime = now; // 強制的に即時更新
+                console.log("[Monitor] Woke up from sleep. Turning off auto refresh.");
+                
+                const mainToggle = document.getElementById('autoRefreshToggle');
+                const popupToggle = document.getElementById('popupAutoRefreshToggle');
+                if (mainToggle) mainToggle.checked = false;
+                if (popupToggle) popupToggle.checked = false;
+                
+                toggleAutoRefresh();
+                
+                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: false }); } catch (e) {}
+                return;
             }
             lastTickTime = now;
 
