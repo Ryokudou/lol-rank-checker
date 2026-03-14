@@ -867,7 +867,7 @@
                         onclick="togglePopupRiotIdInput(event)" data-i18n="lblPopupRiotIdBtn">Riot ID</button>
                     <!-- Riot ID Input Dropdown -->
                     <div id="popupRiotIdDropdown"
-                        class="hidden absolute top-full left-0 mt-2 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-2 w-48 transition-all glass-panel">
+                        class="hidden absolute top-full left-0 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-2 w-48 transition-all glass-panel">
                         <input type="text" id="popupGameName" placeholder="Name#Tag"
                             class="w-full glass-input rounded px-2 py-1.5 text-xs text-white"
                             onkeydown="if(event.key === 'Enter') fetchFromPopup()">
@@ -887,31 +887,6 @@
                 <div class="flex items-center gap-1 mr-1 relative">
                     <button id="popupFontBtn" class="btn-live-toggle" style="background:#475569;"
                         onclick="togglePopupFontDropdown(event)" data-i18n="lblFont">フォント</button>
-                    <!-- Font Selection Dropdown -->
-                    <div id="popupFontDropdown"
-                        class="hidden absolute top-full left-0 mt-2 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-56 transition-all glass-panel">
-                        <button
-                            onclick="changePopupFont('\'Inter\', \'Noto Sans JP\', \'Noto Sans KR\', \'Noto Sans SC\', sans-serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded">Standard</button>
-                        <button onclick="changePopupFont('\'Meiryo\', sans-serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
-                            style="font-family: 'Meiryo', sans-serif;">メイリオ (Meiryo)</button>
-                        <button onclick="changePopupFont('\'Yu Gothic\', sans-serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
-                            style="font-family: 'Yu Gothic', sans-serif;">游ゴシック (Yu Gothic)</button>
-                        <button onclick="changePopupFont('\'MS PGothic\', sans-serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
-                            style="font-family: 'MS PGothic', sans-serif;">MS Pゴシック (MS PGothic)</button>
-                        <button onclick="changePopupFont('\'Yu Mincho\', \'MS Mincho\', serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
-                            style="font-family: 'Yu Mincho', serif;">游明朝 (Cool)</button>
-                        <button onclick="changePopupFont('\'HG Maru Gothic M-PRO\', \'Comic Sans MS\', sans-serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
-                            style="font-family: 'HG Maru Gothic M-PRO', sans-serif;">HG丸ｺﾞｼｯｸM-PRO (Cute)</button>
-                        <button onclick="changePopupFont('\'HGP Soei Kakupoptai\', sans-serif')"
-                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
-                            style="font-family: 'HGP Soei Kakupoptai', sans-serif;">HGP創英角ﾎﾟｯﾌﾟ体 (Pop)</button>
-                    </div>
                 </div>
 
                 <div class="flex items-center gap-1 mr-1 relative">
@@ -919,7 +894,7 @@
                         style="background:#64748b;">COLOR</button>
                     <!-- Color Selection Dropdown -->
                     <div id="popupColorDropdown"
-                        class="hidden absolute top-full left-0 mt-2 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-32 transition-all glass-panel">
+                        class="hidden absolute top-full left-0 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-32 transition-all glass-panel">
                         <button onclick="setStatsColor('#ffffff'); closePopupColor();"
                             class="flex items-center gap-2 w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded text-left">
                             <div class="w-3 h-3 rounded-full border border-white/20" style="background:#ffffff;"></div>
@@ -947,6 +922,31 @@
                     </svg>
                 </button>
             </div>
+        </div>
+        <!-- Font Selection Dropdown (Moved here for easy centering relative to popup) -->
+        <div id="popupFontDropdown"
+            class="hidden absolute top-[40px] left-0 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-56 transition-all glass-panel">
+            <button
+                onclick="changePopupFont('\'Inter\', \'Noto Sans JP\', \'Noto Sans KR\', \'Noto Sans SC\', sans-serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded">Standard</button>
+            <button onclick="changePopupFont('\'Meiryo\', sans-serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                style="font-family: 'Meiryo', sans-serif;">メイリオ (Meiryo)</button>
+            <button onclick="changePopupFont('\'Yu Gothic\', sans-serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                style="font-family: 'Yu Gothic', sans-serif;">游ゴシック (Yu Gothic)</button>
+            <button onclick="changePopupFont('\'MS PGothic\', sans-serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                style="font-family: 'MS PGothic', sans-serif;">MS Pゴシック (MS PGothic)</button>
+            <button onclick="changePopupFont('\'Yu Mincho\', \'MS Mincho\', serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                style="font-family: 'Yu Mincho', serif;">游明朝 (Cool)</button>
+            <button onclick="changePopupFont('\'HG Maru Gothic M-PRO\', \'Comic Sans MS\', sans-serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                style="font-family: 'HG Maru Gothic M-PRO', sans-serif;">HG丸ｺﾞｼｯｸM-PRO (Cute)</button>
+            <button onclick="changePopupFont('\'HGP Soei Kakupoptai\', sans-serif')"
+                class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                style="font-family: 'HGP Soei Kakupoptai', sans-serif;">HGP創英角ﾎﾟｯﾌﾟ体 (Pop)</button>
         </div>
         <div id="popupBody">
             <div id="popupContentContainer"
@@ -1673,10 +1673,21 @@
             }
         }
 
+        function closeAllPopupMenus() {
+            ['popupRiotIdDropdown', 'popupFontDropdown', 'popupColorDropdown'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+        }
+
         function togglePopupRiotIdInput(event) {
             if (event) event.stopPropagation();
             const dropdown = document.getElementById('popupRiotIdDropdown');
-            dropdown.classList.toggle('hidden');
+            const isHidden = dropdown.classList.contains('hidden');
+            closeAllPopupMenus();
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+            }
         }
 
         function closePopupRiotId(event) {
@@ -1690,23 +1701,36 @@
                 }
             }
         }
-
         document.addEventListener('click', closePopupRiotId);
 
         function togglePopupFontDropdown(event) {
             if (event) event.stopPropagation();
             const dropdown = document.getElementById('popupFontDropdown');
+            const btn = document.getElementById('popupFontBtn');
+            const isHidden = dropdown.classList.contains('hidden');
+            
+            closeAllPopupMenus();
 
-            // ライブモードON時は3列表示 & ウィンドウ中央、OFF時は1列表示 & 左端合わせ
-            if (isLiveMode) {
-                dropdown.classList.remove('flex', 'flex-col', 'w-56', 'left-0', 'right-0', 'absolute');
-                dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'fixed', 'left-1/2', '-translate-x-1/2', 'top-[40px]');
-            } else {
-                dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'right-0', 'fixed', 'left-1/2', '-translate-x-1/2', 'top-[40px]');
-                dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56', 'left-0', 'absolute');
+            if (isHidden) {
+                // ライブモードON時は3列表示 & ポップアップ中央合わせ
+                if (isLiveMode) {
+                    dropdown.classList.remove('flex', 'flex-col', 'w-56');
+                    dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'left-1/2', '-translate-x-1/2');
+                    dropdown.style.left = '50%';
+                    dropdown.style.transform = 'translateX(-50%)';
+                } else {
+                    dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'left-1/2', '-translate-x-1/2');
+                    dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56');
+                    // 通常モード時はボタンの下に位置調整（親要素を移動したため）
+                    if (btn) {
+                        const btnRect = btn.getBoundingClientRect();
+                        const popupRect = document.getElementById('floatingPopup').getBoundingClientRect();
+                        dropdown.style.left = (btnRect.left - popupRect.left) + 'px';
+                        dropdown.style.transform = 'none';
+                    }
+                }
+                dropdown.classList.remove('hidden');
             }
-
-            dropdown.classList.toggle('hidden');
         }
 
         function closePopupFont(event) {
@@ -1725,7 +1749,11 @@
         function togglePopupColorDropdown(event) {
             if (event) event.stopPropagation();
             const dropdown = document.getElementById('popupColorDropdown');
-            dropdown.classList.toggle('hidden');
+            const isHidden = dropdown.classList.contains('hidden');
+            closeAllPopupMenus();
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+            }
         }
 
         function closePopupColor(event) {
