@@ -26,13 +26,10 @@
             align-items: center;
         }
 
-        /* ポップアップウィンドウモード用スタイル */
         body.popup-window-mode {
             background: #0f172a;
-            /* ウィンドウキャプチャ用に背景色を確保 */
             background-image: none;
             overflow: hidden !important;
-            /* スクロールバー完全抑止 */
         }
 
         body.popup-window-mode #app-scale-wrapper {
@@ -58,7 +55,6 @@
 
         body.popup-window-mode #popupHeader {
             cursor: default;
-            /* ドラッグ不可を示す */
         }
 
         body.popup-window-mode .close-btn-icon {
@@ -245,7 +241,6 @@
             display: none;
         }
 
-        /* ポップアップUI（ヘッダー・メニュー）の表示制御 */
         #popupHeader, 
         #popupRiotIdDropdown, 
         #popupFontDropdown, 
@@ -253,10 +248,9 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease;
-            transition-delay: 2s; /* マウスが離れてから消えるまでの時間 */
+            transition-delay: 2s;
         }
 
-        /* ホバー時は即座に表示 */
         #floatingPopup:hover #popupHeader,
         #floatingPopup:hover #popupRiotIdDropdown,
         #floatingPopup:hover #popupFontDropdown,
@@ -1045,15 +1039,12 @@
             }
         }
 
-        // URLパラメータでポップアップモード判定
         const urlParams = new URLSearchParams(window.location.search);
         const isPopupWindow = urlParams.get('mode') === 'popup';
-        // データ同期用のチャネル
         const broadcastChannel = new BroadcastChannel('lol_rank_monitor_channel');
 
         if (isPopupWindow) {
             document.body.classList.add('popup-window-mode');
-            // ポップアップモードなら初期状態で表示
             document.getElementById('floatingPopup').classList.remove('hidden');
         }
 
@@ -1263,7 +1254,6 @@
             }
 
             if (isPopupWindow) {
-                // ポップアップモード初期化
                 initPopupMode();
             } else {
                 renderHistory();
@@ -1290,7 +1280,6 @@
                         const regInput = document.getElementById('region');
                         if (regInput) regInput.value = event.data.region;
 
-                        // ポップアップ側から「取得」が押された際にメイン画面でfetchを実行する
                         if (event.data.triggerFetch && !isPopupWindow) {
                             startFetch(false);
                         }
@@ -1303,17 +1292,14 @@
         });
 
         function initPopupMode() {
-            // URLパラメータからlive値を最優先で取得
             const urlLiveParam = urlParams.get('live');
 
-            // ローカルストレージから初期データ取得
             const syncedData = localStorage.getItem('lol_rank_sync_data');
             if (syncedData) {
                 try {
                     const parsed = JSON.parse(syncedData);
                     currentData = parsed.data;
 
-                    // URLパラメータがあればそれを優先してモード決定、なければストレージの値
                     if (urlLiveParam !== null) {
                         isLiveMode = (urlLiveParam === '1');
                     } else {
@@ -1341,13 +1327,12 @@
                     }
 
                     changeLanguage();
-                    updateModeBtn(); // ボタン表示更新
+                    updateModeBtn();
                     renderPopupContent();
                     updatePopupRiotIdUI();
                 } catch (e) { console.error(e); }
             }
 
-            // メインウィンドウからのデータ受信
             broadcastChannel.onmessage = (event) => {
                 if (event.data.type === 'updateData') {
                     currentData = event.data.payload;
@@ -1356,7 +1341,6 @@
                     isLiveMode = event.data.isLiveMode;
                     updateModeBtn();
                     renderPopupContent();
-                    // ウィンドウサイズも合わせたいところだが、セキュリティ制限で効かない場合が多い
                     try {
                         if (isLiveMode) window.resizeTo(836, 225);
                         else window.resizeTo(436, 396);
@@ -1392,7 +1376,7 @@
         }
 
         function initDraggable() {
-            if (isPopupWindow) return; // ポップアップウィンドウではドラッグ不要
+            if (isPopupWindow) return;
 
             const popup = document.getElementById("floatingPopup");
             const header = document.getElementById("popupHeader");
@@ -1728,7 +1712,6 @@
             closeAllPopupMenus();
 
             if (isHidden) {
-                // ライブモードON時は3列表示 & ポップアップ中央合わせ
                 if (isLiveMode) {
                     dropdown.classList.remove('flex', 'flex-col', 'w-56');
                     dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'left-1/2', '-translate-x-1/2');
@@ -1737,7 +1720,6 @@
                 } else {
                     dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'left-1/2', '-translate-x-1/2');
                     dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56');
-                    // 通常モード時はボタンの下に位置調整（親要素を移動したため）
                     if (btn) {
                         const btnRect = btn.getBoundingClientRect();
                         const popupRect = document.getElementById('floatingPopup').getBoundingClientRect();
@@ -1745,6 +1727,13 @@
                         dropdown.style.transform = 'none';
                     }
                 }
+
+                if (btn) {
+                    const btnRect = btn.getBoundingClientRect();
+                    const popupRect = document.getElementById('floatingPopup').getBoundingClientRect();
+                    dropdown.style.top = (btnRect.bottom - popupRect.top) + 'px';
+                }
+
                 dropdown.classList.remove('hidden');
             }
         }
@@ -1787,7 +1776,6 @@
 
         function changePopupFont(fontFamily) {
             closePopupFont();
-            // メイン画面のフォント変更も同期
             const fontSelect = document.getElementById('fontSelect');
             if (fontSelect) fontSelect.value = fontFamily;
 
@@ -1835,26 +1823,21 @@
             const region = document.getElementById('region').value;
 
             try {
-                // 1. 試合中判定
                 try {
                     await fetchWithRetry(`https://${region}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}`);
-                    // 成功(200) = 試合中
                     console.log("[Monitor] Player is currently in game. Skipping refresh.");
                     return;
                 } catch (e) {
-                    // 404以外はエラーとして中断するが、404（試合中ではない）なら次へ
                     if (e.message.indexOf('404') === -1 && e.message.indexOf(t('errNotFound')) === -1) {
                         throw e;
                     }
                 }
 
-                // 2. LP変動確認
                 const leagueData = await fetchWithRetry(`https://${region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`);
                 const soloRank = leagueData.find(entry => entry.queueType === "RANKED_SOLO_5x5");
                 const currentLP = soloRank ? soloRank.leaguePoints : 0;
                 const currentTier = soloRank ? soloRank.tier : "UNRANKED";
 
-                // 画面上のデータと比較 (currentDataは全データ更新時にセットされる)
                 if (currentLP !== currentData.lp || currentTier !== currentData.tier) {
                     console.log("[Monitor] Rank/LP change detected. Starting full fetch.");
                     await startFetch(true);
@@ -1915,13 +1898,11 @@
                 return;
             }
 
-            // デフォルトで常にLIVE ONで開くようにサイズ・状態を固定
             const width = 820;
             const height = 175;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
 
-            // 現在のデータを同期用に保存 (強制的にisLiveMode: true)
             const mainToggle = document.getElementById('autoRefreshToggle');
             const regionVal = document.getElementById('region').value;
             localStorage.setItem('lol_rank_sync_data', JSON.stringify({
@@ -1933,7 +1914,6 @@
                 isAutoRefreshChecked: mainToggle ? mainToggle.checked : false
             }));
 
-            // 新しいウィンドウを開く (強制的にlive=1)
             const liveParam = '1';
 
             window.open(
@@ -1959,20 +1939,17 @@
             // ウィンドウ内のコンテンツ調整のみ行う（Container Queriesがサイズに追従する）
             const popup = document.getElementById('floatingPopup');
             if (!isPopupWindow) {
-                // 通常モード内のドラッグ可能ポップアップのサイズ調整
                 if (isLiveMode) {
                     popup.style.width = '820px';
                     popup.style.height = '175px';
                 } else {
                     popup.style.width = '420px';
-                    popup.style.height = '550px'; /* さらに10%追加拡張 */
+                    popup.style.height = '550px';
                 }
             } else {
-                // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
                 try {
-                    // 枠分を適当に考慮
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 650); /* さらに10%追加拡張 */
+                    else window.resizeTo(436, 650);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
@@ -2053,10 +2030,8 @@
                     statValues[1].style.color = currentStatsColor;
                 }
 
-                // 履歴バー (Liveモードのみ)
                 if (isLiveMode) {
                     let historyBar = existingContent.querySelector('.history-bar');
-                    // 履歴HTML生成
                     let historyHtml = '';
                     if (history && history.length > 0) {
                         history.forEach((isWin, index) => {
@@ -2071,7 +2046,6 @@
                     if (historyBar) {
                         if (historyBar.innerHTML !== historyHtml) historyBar.innerHTML = historyHtml;
                     } else if (historyHtml) {
-                        // バーが存在しないが履歴がある場合、stats-rowに追加
                         const statsRow = existingContent.querySelector('.cq-stats-row');
                         if (statsRow) {
                             const newBar = document.createElement('div');
@@ -2081,10 +2055,9 @@
                         }
                     }
                 }
-                return; // 部分更新完了
+                return;
             }
 
-            // 完全再描画 (初回 or レイアウト変更時)
             let rankImgHtml = imgSrc ? `<img src="${imgSrc}" class="cq-rank-icon" alt="${tier}">` : '';
 
             if (isLiveMode) {
@@ -2393,7 +2366,6 @@
             console.log("API Rate Limiter initialized: Max 115 req/min");
         })();
 
-        // ネットワーク再接続（スリープ復帰など）時の自動更新
         window.addEventListener('online', () => {
             console.log("[Monitor] Network is back online. Resuming data sync.");
             if (currentData && currentData.account) {
@@ -2401,7 +2373,6 @@
                 // メインウィンドウ側でのみ再取得処理をキックする
                 if (!isPopupWindow) {
                     console.log("[Monitor] Forcing data refresh after coming online.");
-                    // 裏側でフェッチを実行して、メインとポップアップ両方の表示を更新
                     startFetch(true);
                 }
             }
