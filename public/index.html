@@ -825,7 +825,7 @@
 
     <!-- Draggable Popup (Shared with Popup Mode) -->
     <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl"
-        style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 380px;">
+        style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 420px;">
         <div id="popupHeader">
             <div class="flex items-center gap-2 flex-wrap">
                 <div class="flex items-center gap-1">
@@ -880,6 +880,21 @@
                         <button onclick="fetchFromPopup()"
                             class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs py-1.5 rounded mt-1 font-bold"
                             data-i18n="lblPopupFetchBtn">取得</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1 mr-1 relative">
+                    <button id="popupFontBtn" class="btn-live-toggle" style="background:#475569;"
+                        onclick="togglePopupFontDropdown(event)" data-i18n="lblFont">フォント</button>
+                    <!-- Font Selection Dropdown -->
+                    <div id="popupFontDropdown"
+                        class="hidden absolute top-full left-0 mt-2 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-48 transition-all glass-panel">
+                        <button onclick="changePopupFont('\'Inter\', \'Noto Sans JP\', \'Noto Sans KR\', \'Noto Sans SC\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded">Standard</button>
+                        <button onclick="changePopupFont('\'Meiryo\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Meiryo', sans-serif;">メイリオ (Meiryo)</button>
+                        <button onclick="changePopupFont('\'Yu Gothic\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Yu Gothic', sans-serif;">游ゴシック (Yu Gothic)</button>
+                        <button onclick="changePopupFont('\'Klee One\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Klee One', sans-serif;">Klee One</button>
+                        <button onclick="changePopupFont('\'Hachi Maru Pop\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Hachi Maru Pop', sans-serif;">Hachi Maru Pop</button>
+                        <button onclick="changePopupFont('\'Zen Maru Gothic\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Zen Maru Gothic', sans-serif;">Zen Maru Gothic</button>
                     </div>
                 </div>
 
@@ -1661,6 +1676,39 @@
 
         document.addEventListener('click', closePopupRiotId);
 
+        function togglePopupFontDropdown(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('popupFontDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function closePopupFont(event) {
+            const dropdown = document.getElementById('popupFontDropdown');
+            const btn = document.getElementById('popupFontBtn');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (event && !dropdown.contains(event.target) && btn && !btn.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                } else if (!event) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        }
+        document.addEventListener('click', closePopupFont);
+
+        function changePopupFont(fontFamily) {
+            closePopupFont();
+            // メイン画面のフォント変更も同期
+            const fontSelect = document.getElementById('fontSelect');
+            if (fontSelect) fontSelect.value = fontFamily;
+            
+            currentFont = fontFamily;
+            document.body.style.fontFamily = fontFamily;
+            localStorage.setItem('lol_custom_font', fontFamily);
+            try {
+                broadcastChannel.postMessage({ type: 'changeFont', font: fontFamily });
+            } catch (e) { }
+        }
+
         function fetchFromPopup() {
             closePopupRiotId();
             const popupGameName = document.getElementById('popupGameName').value;
@@ -1827,14 +1875,14 @@
                     popup.style.height = '175px';
                 } else {
                     popup.style.width = '420px';
-                    popup.style.height = '380px';
+                    popup.style.height = '420px'; /* 拡張しました */
                 }
             } else {
                 // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
                 try {
                     // 枠分を適当に考慮
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 440);
+                    else window.resizeTo(436, 480); /* 拡張しました */
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
