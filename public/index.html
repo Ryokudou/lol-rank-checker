@@ -1697,13 +1697,13 @@
             if (event) event.stopPropagation();
             const dropdown = document.getElementById('popupFontDropdown');
 
-            // ライブモードON時は3列表示 & 右端合わせ、OFF時は1列表示 & 左端合わせ
+            // ライブモードON時は3列表示 & ウィンドウ中央、OFF時は1列表示 & 左端合わせ
             if (isLiveMode) {
-                dropdown.classList.remove('flex', 'flex-col', 'w-56', 'left-0');
-                dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'right-0');
+                dropdown.classList.remove('flex', 'flex-col', 'w-56', 'left-0', 'right-0', 'absolute');
+                dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'fixed', 'left-1/2', '-translate-x-1/2', 'top-[50px]');
             } else {
-                dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'right-0');
-                dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56', 'left-0');
+                dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'right-0', 'fixed', 'left-1/2', '-translate-x-1/2', 'top-[50px]');
+                dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56', 'left-0', 'absolute');
             }
 
             dropdown.classList.toggle('hidden');
