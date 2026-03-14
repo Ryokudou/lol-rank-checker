@@ -307,7 +307,8 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding: 10cqh 2cqw; /* 上下に余白を追加 */
+            padding: 10cqh 2cqw;
+            /* 上下に余白を追加 */
             box-sizing: border-box;
             align-items: center;
             justify-content: center;
@@ -889,13 +890,27 @@
                     <!-- Font Selection Dropdown -->
                     <div id="popupFontDropdown"
                         class="hidden absolute top-full left-0 mt-2 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-56 transition-all glass-panel">
-                        <button onclick="changePopupFont('\'Inter\', \'Noto Sans JP\', \'Noto Sans KR\', \'Noto Sans SC\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded">Standard</button>
-                        <button onclick="changePopupFont('\'Meiryo\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Meiryo', sans-serif;">メイリオ (Meiryo)</button>
-                        <button onclick="changePopupFont('\'Yu Gothic\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Yu Gothic', sans-serif;">游ゴシック (Yu Gothic)</button>
-                        <button onclick="changePopupFont('\'MS PGothic\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'MS PGothic', sans-serif;">MS Pゴシック (MS PGothic)</button>
-                        <button onclick="changePopupFont('\'Yu Mincho\', \'MS Mincho\', serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'Yu Mincho', serif;">游明朝 (Cool)</button>
-                        <button onclick="changePopupFont('\'HG Maru Gothic M-PRO\', \'Comic Sans MS\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'HG Maru Gothic M-PRO', sans-serif;">HG丸ｺﾞｼｯｸM-PRO (Cute)</button>
-                        <button onclick="changePopupFont('\'HGP Soei Kakupoptai\', sans-serif')" class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded" style="font-family: 'HGP Soei Kakupoptai', sans-serif;">HGP創英角ﾎﾟｯﾌﾟ体 (Pop)</button>
+                        <button
+                            onclick="changePopupFont('\'Inter\', \'Noto Sans JP\', \'Noto Sans KR\', \'Noto Sans SC\', sans-serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded">Standard</button>
+                        <button onclick="changePopupFont('\'Meiryo\', sans-serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                            style="font-family: 'Meiryo', sans-serif;">メイリオ (Meiryo)</button>
+                        <button onclick="changePopupFont('\'Yu Gothic\', sans-serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                            style="font-family: 'Yu Gothic', sans-serif;">游ゴシック (Yu Gothic)</button>
+                        <button onclick="changePopupFont('\'MS PGothic\', sans-serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                            style="font-family: 'MS PGothic', sans-serif;">MS Pゴシック (MS PGothic)</button>
+                        <button onclick="changePopupFont('\'Yu Mincho\', \'MS Mincho\', serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                            style="font-family: 'Yu Mincho', serif;">游明朝 (Cool)</button>
+                        <button onclick="changePopupFont('\'HG Maru Gothic M-PRO\', \'Comic Sans MS\', sans-serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                            style="font-family: 'HG Maru Gothic M-PRO', sans-serif;">HG丸ｺﾞｼｯｸM-PRO (Cute)</button>
+                        <button onclick="changePopupFont('\'HGP Soei Kakupoptai\', sans-serif')"
+                            class="text-left w-full text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded"
+                            style="font-family: 'HGP Soei Kakupoptai', sans-serif;">HGP創英角ﾎﾟｯﾌﾟ体 (Pop)</button>
                     </div>
                 </div>
 
@@ -933,7 +948,8 @@
             </div>
         </div>
         <div id="popupBody">
-            <div id="popupContentContainer" class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+            <div id="popupContentContainer"
+                class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
                 No Data.
             </div>
         </div>
@@ -1679,6 +1695,16 @@
         function togglePopupFontDropdown(event) {
             if (event) event.stopPropagation();
             const dropdown = document.getElementById('popupFontDropdown');
+            
+            // ライブモードON時は2列表示、OFF時は1列表示に切り替え
+            if (isLiveMode) {
+                dropdown.classList.remove('flex', 'flex-col', 'w-56');
+                dropdown.classList.add('grid', 'grid-cols-2', 'gap-2', 'w-[400px]');
+            } else {
+                dropdown.classList.remove('grid', 'grid-cols-2', 'gap-2', 'w-[400px]');
+                dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56');
+            }
+            
             dropdown.classList.toggle('hidden');
         }
 
@@ -1875,14 +1901,14 @@
                     popup.style.height = '175px';
                 } else {
                     popup.style.width = '420px';
-                    popup.style.height = '520px'; /* さらなる拡張 */
+                    popup.style.height = '550px'; /* さらに10%追加拡張 */
                 }
             } else {
                 // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
                 try {
                     // 枠分を適当に考慮
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 600); /* さらなる拡張 */
+                    else window.resizeTo(436, 650); /* さらに10%追加拡張 */
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
