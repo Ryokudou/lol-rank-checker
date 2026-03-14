@@ -915,8 +915,8 @@
                 </div>
 
                 <div class="flex items-center gap-1 mr-1 relative">
-                    <button id="popupColorBtn" onclick="togglePopupColorDropdown(event)"
-                        class="btn-live-toggle" style="background:#64748b;">COLOR</button>
+                    <button id="popupColorBtn" onclick="togglePopupColorDropdown(event)" class="btn-live-toggle"
+                        style="background:#64748b;">COLOR</button>
                     <!-- Color Selection Dropdown -->
                     <div id="popupColorDropdown"
                         class="hidden absolute top-full left-0 mt-2 p-2 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-1 w-32 transition-all glass-panel">
@@ -1697,13 +1697,13 @@
             if (event) event.stopPropagation();
             const dropdown = document.getElementById('popupFontDropdown');
 
-            // ライブモードON時は3列表示、OFF時は1列表示に切り替え
+            // ライブモードON時は3列表示 & 右端合わせ、OFF時は1列表示 & 左端合わせ
             if (isLiveMode) {
-                dropdown.classList.remove('flex', 'flex-col', 'w-56');
-                dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]');
+                dropdown.classList.remove('flex', 'flex-col', 'w-56', 'left-0');
+                dropdown.classList.add('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'right-0');
             } else {
-                dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]');
-                dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56');
+                dropdown.classList.remove('grid', 'grid-cols-3', 'gap-2', 'w-[580px]', 'right-0');
+                dropdown.classList.add('flex', 'flex-col', 'gap-1', 'w-56', 'left-0');
             }
 
             dropdown.classList.toggle('hidden');
