@@ -274,21 +274,24 @@
 
         #popupHeader {
             flex-shrink: 0;
-            height: 32px;
+            min-height: 32px;
             cursor: move;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 8px;
+            flex-wrap: wrap;
+            padding: 4px 8px;
             background: rgba(0, 0, 0, 0.4);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             user-select: none;
+            gap: 4px;
         }
 
         #popupBody {
             flex-grow: 1;
             width: 100%;
-            height: calc(100% - 32px);
+            height: 0;
+            min-height: 0;
             position: relative;
             overflow: hidden;
         }
@@ -823,25 +826,53 @@
     <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl"
         style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 336px;">
         <div id="popupHeader">
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20"
-                    fill="currentColor">
-                    <path
-                        d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK
-                    MONITOR</span>
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path
+                            d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK
+                        MONITOR</span>
+                </div>
+                <select id="popupLangSelect" onchange="changePopupLanguage()" class="bg-slate-800 text-[10px] text-slate-300 border border-slate-700 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer">
+                    <option value="ja">JP</option>
+                    <option value="en">US</option>
+                    <option value="ko">KR</option>
+                    <option value="zh">CN</option>
+                </select>
             </div>
-            <div class="flex items-center gap-2">
-                <div id="popupAutoRefreshContainer" class="hidden flex items-center mr-1">
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <div id="popupAutoRefreshContainer" class="flex items-center mr-1">
                     <label class="flex items-center gap-1 cursor-pointer group mb-0">
                         <div class="relative flex items-center">
-                            <input type="checkbox" id="popupAutoRefreshToggle" onchange="syncAutoRefreshToggle(this)" class="peer sr-only">
-                            <div class="w-7 h-4 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
+                            <input type="checkbox" id="popupAutoRefreshToggle" onchange="syncAutoRefreshToggle(this)"
+                                class="peer sr-only">
+                            <div
+                                class="w-7 h-4 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600">
+                            </div>
                         </div>
-                        <span id="popupTimerLabel" class="text-[10px] font-bold text-gray-300 whitespace-nowrap">10分更新</span>
+                        <span id="popupTimerLabel"
+                            class="text-[10px] font-bold text-gray-300 whitespace-nowrap">10分更新</span>
                     </label>
                 </div>
+                
+                <div class="flex items-center gap-1 mr-1 relative">
+                    <button id="popupRiotIdBtn" class="btn-live-toggle" style="background:#f59e0b;" onclick="togglePopupRiotIdInput(event)">Riot ID</button>
+                    <!-- Riot ID Input Dropdown -->
+                    <div id="popupRiotIdDropdown" class="hidden absolute top-full left-0 mt-2 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-2 w-48 transition-all glass-panel">
+                        <input type="text" id="popupGameName" placeholder="Name#Tag" class="w-full glass-input rounded px-2 py-1.5 text-xs text-white" onkeydown="if(event.key === 'Enter') fetchFromPopup()">
+                        <select id="popupRegion" onchange="updatePopupRiotIdUI()" class="w-full glass-input rounded px-2 py-1.5 text-xs text-white">
+                           <option value="jp1">JP</option>
+                           <option value="na1">US</option>
+                           <option value="kr">KR</option>
+                           <option value="euw1">EUW</option>
+                        </select>
+                        <button onclick="fetchFromPopup()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs py-1.5 rounded mt-1 font-bold">取得</button>
+                    </div>
+                </div>
+
                 <div class="flex items-center gap-1 mr-1">
                     <button id="colorToggleBtn"
                         onclick="document.getElementById('colorPickerPalette').classList.toggle('hidden')"
@@ -1168,6 +1199,17 @@
                             mainToggle.checked = event.data.isChecked;
                             toggleAutoRefresh();
                         }
+                    } else if (event.data.type === 'changeLanguage') {
+                        const langSelect = document.getElementById('langSelect');
+                        if (langSelect && langSelect.value !== event.data.lang) {
+                            langSelect.value = event.data.lang;
+                            changeLanguage();
+                        }
+                    } else if (event.data.type === 'syncInput') {
+                        const gnInput = document.getElementById('gameName');
+                        if (gnInput) gnInput.value = event.data.gameName;
+                        const regInput = document.getElementById('region');
+                        if (regInput) regInput.value = event.data.region;
                     }
                 };
             }
@@ -1214,6 +1256,7 @@
                     changeLanguage();
                     updateModeBtn(); // ボタン表示更新
                     renderPopupContent();
+                    updatePopupRiotIdUI();
                 } catch (e) { console.error(e); }
             }
 
@@ -1240,6 +1283,17 @@
                 } else if (event.data.type === 'changeFont') {
                     document.body.style.fontFamily = event.data.font;
                     currentFont = event.data.font;
+                } else if (event.data.type === 'changeLanguage') {
+                    const popupLangSelect = document.getElementById('popupLangSelect');
+                    if (popupLangSelect && popupLangSelect.value !== event.data.lang) {
+                        popupLangSelect.value = event.data.lang;
+                        changeLanguage();
+                    }
+                } else if (event.data.type === 'syncInput') {
+                    const popupGn = document.getElementById('popupGameName');
+                    if (popupGn) popupGn.value = event.data.gameName;
+                    const popupReg = document.getElementById('popupRegion');
+                    if (popupReg) popupReg.value = event.data.region;
                 }
             };
         }
@@ -1308,8 +1362,24 @@
                 }
             });
 
+            const popupLangSelect = document.getElementById('popupLangSelect');
+            if (popupLangSelect && popupLangSelect.value !== lang) {
+                popupLangSelect.value = lang;
+            }
+
             updateModeBtn();
             updateDynamicInputText();
+            updatePopupRiotIdUI();
+        }
+
+        function changePopupLanguage() {
+            const lang = document.getElementById('popupLangSelect').value;
+            const mainLangSelect = document.getElementById('langSelect');
+            if (mainLangSelect && mainLangSelect.value !== lang) {
+                mainLangSelect.value = lang;
+                changeLanguage();
+                try { broadcastChannel.postMessage({ type: 'changeLanguage', lang: lang }); } catch (e) {}
+            }
         }
 
         function updateDynamicInputText() {
@@ -1339,6 +1409,34 @@
 
             if (gameNameInput) gameNameInput.placeholder = combinedText;
             if (gameNameLabel) gameNameLabel.innerText = 'Riot ID (' + combinedText + ')';
+        }
+
+        function updatePopupRiotIdUI() {
+            const lang = document.getElementById('langSelect').value;
+            const regEl = document.getElementById('popupRegion');
+            if(!regEl) return;
+            
+            let tag = regEl.value.toUpperCase();
+            if (tag === 'KR') tag = 'KR1';
+
+            let baseName = "Player Name";
+            let hash = "#";
+
+            if (lang === 'ja') {
+                baseName = "プレイヤー名";
+            } else if (lang === 'ko') {
+                baseName = "プレイヤー名";
+                hash = "＃";
+                tag = tag.replace(/[0-9]/g, function (s) {
+                    return String.fromCharCode(s.charCodeAt(0) + 0xFEE0);
+                });
+            } else if (lang === 'zh') {
+                baseName = "玩家名称";
+            }
+
+            const combinedText = baseName + hash + tag;
+            const popupGameNameInput = document.getElementById('popupGameName');
+            if (popupGameNameInput) popupGameNameInput.placeholder = combinedText;
         }
 
         function saveToHistory(name, tag, region) {
@@ -1459,7 +1557,7 @@
             const mainToggle = document.getElementById('autoRefreshToggle');
             if (mainToggle) mainToggle.checked = isChecked;
             toggleAutoRefresh();
-            try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) {}
+            try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) { }
         }
 
         function toggleAutoRefresh() {
@@ -1479,7 +1577,7 @@
                 if (refreshTimerId) { clearInterval(refreshTimerId); refreshTimerId = null; }
                 timerLabel.classList.add('hidden');
                 timerLabel.innerText = '';
-                
+
                 const pt = document.getElementById('popupTimerLabel');
                 if (pt) {
                     pt.innerText = '10分更新';
@@ -1489,9 +1587,50 @@
             }
         }
 
+        function togglePopupRiotIdInput(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('popupRiotIdDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function closePopupRiotId(event) {
+            const dropdown = document.getElementById('popupRiotIdDropdown');
+            const btn = document.getElementById('popupRiotIdBtn');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (event && !dropdown.contains(event.target) && btn && !btn.contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                } else if (!event) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        }
+
+        document.addEventListener('click', closePopupRiotId);
+
+        function fetchFromPopup() {
+            closePopupRiotId();
+            const popupGameName = document.getElementById('popupGameName').value;
+            const popupRegion = document.getElementById('popupRegion').value;
+            
+            if(!popupGameName) {
+                alert("Riot ID を入力してください。");
+                return;
+            }
+            
+            const mainGameName = document.getElementById('gameName');
+            const mainRegion = document.getElementById('region');
+            
+            if (mainGameName) mainGameName.value = popupGameName;
+            if (mainRegion) mainRegion.value = popupRegion;
+
+            try { broadcastChannel.postMessage({ type: 'syncInput', gameName: popupGameName, region: popupRegion }); } catch(e){}
+            
+            startFetch(false);
+        }
+
         async function checkStatusAndRefresh() {
             if (!currentData || !currentData.account) return;
-            
+
             const now = Date.now();
             const lastCheck = parseInt(localStorage.getItem('lol_last_refresh') || '0', 10);
             if (now - lastCheck < 30000) {
@@ -1537,25 +1676,25 @@
 
         function updateTimerAndFetch() {
             const now = Date.now();
-            
+
             // スリープからの復帰検知 (1秒ごとのTickが10秒以上遅れた場合)
             if (lastTickTime !== 0 && (now - lastTickTime) > 10000) {
                 console.log("[Monitor] Woke up from sleep. Turning off auto refresh.");
-                
+
                 const mainToggle = document.getElementById('autoRefreshToggle');
                 const popupToggle = document.getElementById('popupAutoRefreshToggle');
                 if (mainToggle) mainToggle.checked = false;
                 if (popupToggle) popupToggle.checked = false;
-                
+
                 toggleAutoRefresh();
-                
-                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: false }); } catch (e) {}
+
+                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: false }); } catch (e) { }
                 return;
             }
             lastTickTime = now;
 
             const diff = nextRefreshTime - now;
-            
+
             let timerText = '';
             if (diff <= 0) {
                 checkStatusAndRefresh();
@@ -1567,7 +1706,7 @@
                 const s = Math.floor((diff % 60000) / 1000);
                 timerText = `(${m}:${s.toString().padStart(2, '0')})`;
             }
-            
+
             document.getElementById('timerLabel').innerText = timerText;
             const pt = document.getElementById('popupTimerLabel');
             if (pt) {
@@ -1663,11 +1802,9 @@
             if (isLiveMode) {
                 btn.innerText = t('liveModeOn');
                 btn.classList.add('active-mode');
-                if (popupRefreshContainer) popupRefreshContainer.classList.remove('hidden');
             } else {
                 btn.innerText = t('liveModeOff');
                 btn.classList.remove('active-mode');
-                if (popupRefreshContainer) popupRefreshContainer.classList.add('hidden');
             }
         }
 
