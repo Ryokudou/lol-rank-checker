@@ -698,8 +698,9 @@
                                                         stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
-                                            <p class="pr-5 leading-relaxed">
-                                                Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURLをブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。
+                                            <p class="pr-5 leading-relaxed text-red-500 font-bold">
+                                                Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURLをブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
+                                                ポップアップのRiot IDを選択し、ご自身のIDを入力してください。
                                             </p>
                                         </div>
                                     </div>
@@ -824,7 +825,7 @@
 
     <!-- Draggable Popup (Shared with Popup Mode) -->
     <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl"
-        style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 336px;">
+        style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 380px;">
         <div id="popupHeader">
             <div class="flex items-center gap-2 flex-wrap">
                 <div class="flex items-center gap-1">
@@ -836,14 +837,16 @@
                     <span class="text-[10px] font-bold text-gray-300 tracking-wider" data-i18n="popupTitle">RANK
                         MONITOR</span>
                 </div>
-                <select id="popupLangSelect" onchange="changePopupLanguage()" class="bg-slate-800 text-[10px] text-slate-300 border border-slate-700 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer">
+            </div>
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <select id="popupLangSelect" onchange="changePopupLanguage()"
+                    class="bg-slate-800 text-[10px] text-slate-300 border border-slate-700 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer mr-1">
                     <option value="ja">JP</option>
                     <option value="en">US</option>
                     <option value="ko">KR</option>
                     <option value="zh">CN</option>
                 </select>
-            </div>
-            <div class="flex items-center gap-2 flex-wrap justify-end">
+
                 <div id="popupAutoRefreshContainer" class="flex items-center mr-1">
                     <label class="flex items-center gap-1 cursor-pointer group mb-0">
                         <div class="relative flex items-center">
@@ -854,22 +857,28 @@
                             </div>
                         </div>
                         <span id="popupTimerLabel"
-                            class="text-[10px] font-bold text-gray-300 whitespace-nowrap">10分更新</span>
+                            class="text-[10px] font-bold text-gray-300 whitespace-nowrap" data-i18n="lblPopupRefresh">10分更新</span>
                     </label>
                 </div>
-                
+
                 <div class="flex items-center gap-1 mr-1 relative">
-                    <button id="popupRiotIdBtn" class="btn-live-toggle" style="background:#f59e0b;" onclick="togglePopupRiotIdInput(event)">Riot ID</button>
+                    <button id="popupRiotIdBtn" class="btn-live-toggle" style="background:#f59e0b;"
+                        onclick="togglePopupRiotIdInput(event)" data-i18n="lblPopupRiotIdBtn">Riot ID</button>
                     <!-- Riot ID Input Dropdown -->
-                    <div id="popupRiotIdDropdown" class="hidden absolute top-full left-0 mt-2 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-2 w-48 transition-all glass-panel">
-                        <input type="text" id="popupGameName" placeholder="Name#Tag" class="w-full glass-input rounded px-2 py-1.5 text-xs text-white" onkeydown="if(event.key === 'Enter') fetchFromPopup()">
-                        <select id="popupRegion" onchange="updatePopupRiotIdUI()" class="w-full glass-input rounded px-2 py-1.5 text-xs text-white">
-                           <option value="jp1">JP</option>
-                           <option value="na1">US</option>
-                           <option value="kr">KR</option>
-                           <option value="euw1">EUW</option>
+                    <div id="popupRiotIdDropdown"
+                        class="hidden absolute top-full left-0 mt-2 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-col gap-2 w-48 transition-all glass-panel">
+                        <input type="text" id="popupGameName" placeholder="Name#Tag"
+                            class="w-full glass-input rounded px-2 py-1.5 text-xs text-white"
+                            onkeydown="if(event.key === 'Enter') fetchFromPopup()">
+                        <select id="popupRegion" onchange="updatePopupRiotIdUI()"
+                            class="w-full glass-input rounded px-2 py-1.5 text-xs text-white">
+                            <option value="jp1">JP</option>
+                            <option value="na1">US</option>
+                            <option value="kr">KR</option>
+                            <option value="euw1">EUW</option>
                         </select>
-                        <button onclick="fetchFromPopup()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs py-1.5 rounded mt-1 font-bold">取得</button>
+                        <button onclick="fetchFromPopup()"
+                            class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs py-1.5 rounded mt-1 font-bold" data-i18n="lblPopupFetchBtn">取得</button>
                     </div>
                 </div>
 
@@ -891,10 +900,10 @@
                     </div>
                 </div>
                 <button id="transparentBtn" onclick="toggleTransparentMode()" class="btn-live-toggle"
-                    style="background:#8b5cf6; margin-right:4px;">透過</button>
+                    style="background:#8b5cf6; margin-right:4px;" data-i18n="lblPopupTransparent">透過</button>
                 <button id="chromakeyBtn" onclick="toggleChromaKey()" class="btn-live-toggle"
-                    style="background:#10b981; margin-right:4px;">CHROMA</button>
-                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle">LIVE MODE: OFF</button>
+                    style="background:#10b981; margin-right:4px;" data-i18n="lblPopupChroma">CHROMA</button>
+                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle" data-i18n="liveModeOff">LIVE MODE: OFF</button>
                 <button onclick="closeFloatingPopup()"
                     class="text-gray-400 hover:text-white transition-colors p-1 popup-close-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 close-btn-icon" fill="none"
@@ -1034,7 +1043,12 @@
                 regJp: "日本 (JP)",
                 regNa: "北米 (NA)",
                 regEuw: "西欧 (EUW)",
-                regKr: "韓国 (KR)"
+                regKr: "韓国 (KR)",
+                lblPopupRefresh: "10分更新",
+                lblPopupRiotIdBtn: "Riot ID",
+                lblPopupFetchBtn: "取得",
+                lblPopupTransparent: "透過",
+                lblPopupChroma: "CHROMA"
             },
             en: {
                 appTitle: "LoL Rank Checker",
@@ -1071,7 +1085,12 @@
                 regJp: "Japan (JP)",
                 regNa: "North America (NA)",
                 regEuw: "Europe West (EUW)",
-                regKr: "Korea (KR)"
+                regKr: "Korea (KR)",
+                lblPopupRefresh: "10m Refresh",
+                lblPopupRiotIdBtn: "Riot ID",
+                lblPopupFetchBtn: "Search",
+                lblPopupTransparent: "Transp.",
+                lblPopupChroma: "CHROMA"
             },
             ko: {
                 appTitle: "LoL 랭크 체커",
@@ -1108,7 +1127,12 @@
                 regJp: "일본 (JP)",
                 regNa: "북미 (NA)",
                 regEuw: "서유럽 (EUW)",
-                regKr: "한국 (KR)"
+                regKr: "한국 (KR)",
+                lblPopupRefresh: "10분 갱신",
+                lblPopupRiotIdBtn: "Riot ID",
+                lblPopupFetchBtn: "검색",
+                lblPopupTransparent: "투명",
+                lblPopupChroma: "크로마"
             },
             zh: {
                 appTitle: "LoL 段位查询器",
@@ -1145,7 +1169,12 @@
                 regJp: "日本 (JP)",
                 regNa: "北美 (NA)",
                 regEuw: "西欧 (EUW)",
-                regKr: "韩国 (KR)"
+                regKr: "韩国 (KR)",
+                lblPopupRefresh: "10分钟更新",
+                lblPopupRiotIdBtn: "Riot ID",
+                lblPopupFetchBtn: "获取",
+                lblPopupTransparent: "透明",
+                lblPopupChroma: "绿幕"
             }
         };
 
@@ -1355,12 +1384,24 @@
 
             // Region Options
             const regionSelect = document.getElementById('region');
-            Array.from(regionSelect.options).forEach(opt => {
-                const key = regionNames[opt.value];
-                if (key && texts[key]) {
-                    opt.text = texts[key];
-                }
-            });
+            if (regionSelect) {
+                Array.from(regionSelect.options).forEach(opt => {
+                    const key = regionNames[opt.value];
+                    if (key && texts[key]) {
+                        opt.text = texts[key];
+                    }
+                });
+            }
+
+            const popupRegionSelect = document.getElementById('popupRegion');
+            if (popupRegionSelect) {
+                Array.from(popupRegionSelect.options).forEach(opt => {
+                    const key = regionNames[opt.value];
+                    if (key && texts[key]) {
+                        opt.text = texts[key];
+                    }
+                });
+            }
 
             const popupLangSelect = document.getElementById('popupLangSelect');
             if (popupLangSelect && popupLangSelect.value !== lang) {
@@ -1378,7 +1419,7 @@
             if (mainLangSelect && mainLangSelect.value !== lang) {
                 mainLangSelect.value = lang;
                 changeLanguage();
-                try { broadcastChannel.postMessage({ type: 'changeLanguage', lang: lang }); } catch (e) {}
+                try { broadcastChannel.postMessage({ type: 'changeLanguage', lang: lang }); } catch (e) { }
             }
         }
 
@@ -1414,8 +1455,8 @@
         function updatePopupRiotIdUI() {
             const lang = document.getElementById('langSelect').value;
             const regEl = document.getElementById('popupRegion');
-            if(!regEl) return;
-            
+            if (!regEl) return;
+
             let tag = regEl.value.toUpperCase();
             if (tag === 'KR') tag = 'KR1';
 
@@ -1579,8 +1620,11 @@
                 timerLabel.innerText = '';
 
                 const pt = document.getElementById('popupTimerLabel');
+                const lang = document.getElementById('langSelect').value;
+                const txt = i18n[lang] ? i18n[lang].lblPopupRefresh : "10分更新";
+
                 if (pt) {
-                    pt.innerText = '10分更新';
+                    pt.innerText = txt;
                     pt.classList.remove('text-blue-400', 'font-mono');
                     pt.classList.add('text-gray-300');
                 }
@@ -1611,20 +1655,20 @@
             closePopupRiotId();
             const popupGameName = document.getElementById('popupGameName').value;
             const popupRegion = document.getElementById('popupRegion').value;
-            
-            if(!popupGameName) {
+
+            if (!popupGameName) {
                 alert("Riot ID を入力してください。");
                 return;
             }
-            
+
             const mainGameName = document.getElementById('gameName');
             const mainRegion = document.getElementById('region');
-            
+
             if (mainGameName) mainGameName.value = popupGameName;
             if (mainRegion) mainRegion.value = popupRegion;
 
-            try { broadcastChannel.postMessage({ type: 'syncInput', gameName: popupGameName, region: popupRegion }); } catch(e){}
-            
+            try { broadcastChannel.postMessage({ type: 'syncInput', gameName: popupGameName, region: popupRegion }); } catch (e) { }
+
             startFetch(false);
         }
 
@@ -1723,27 +1767,26 @@
                 return;
             }
 
-            // サイズ調整: LIVEモード2.5倍、通常モード1.5倍
-            const width = isLiveMode ? 820 : 420;
-            const height = isLiveMode ? 175 : 336;
+            // デフォルトで常にLIVE ONで開くようにサイズ・状態を固定
+            const width = 820;
+            const height = 175;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
 
-            // 現在のデータを同期用に保存
+            // 現在のデータを同期用に保存 (強制的にisLiveMode: true)
             const mainToggle = document.getElementById('autoRefreshToggle');
             const regionVal = document.getElementById('region').value;
             localStorage.setItem('lol_rank_sync_data', JSON.stringify({
                 data: currentData,
-                isLiveMode: isLiveMode,
+                isLiveMode: true,
                 lang: document.getElementById('langSelect').value,
                 font: currentFont,
                 region: regionVal,
                 isAutoRefreshChecked: mainToggle ? mainToggle.checked : false
             }));
 
-            // 新しいウィンドウを開く
-            // liveパラメータを付与して、開いた瞬間のモードを確定させる
-            const liveParam = isLiveMode ? '1' : '0';
+            // 新しいウィンドウを開く (強制的にlive=1)
+            const liveParam = '1';
 
             window.open(
                 `${window.location.pathname}?mode=popup&live=${liveParam}`,
@@ -1774,14 +1817,14 @@
                     popup.style.height = '175px';
                 } else {
                     popup.style.width = '420px';
-                    popup.style.height = '336px';
+                    popup.style.height = '380px';
                 }
             } else {
                 // ポップアップウィンドウモードの場合、ウィンドウサイズ変更を試みる
                 try {
                     // 枠分を適当に考慮
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 396);
+                    else window.resizeTo(436, 440);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
