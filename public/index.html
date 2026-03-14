@@ -245,6 +245,28 @@
             display: none;
         }
 
+        /* ポップアップUI（ヘッダー・メニュー）の表示制御 */
+        #popupHeader, 
+        #popupRiotIdDropdown, 
+        #popupFontDropdown, 
+        #popupColorDropdown {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            transition-delay: 2s; /* マウスが離れてから消えるまでの時間 */
+        }
+
+        /* ホバー時は即座に表示 */
+        #floatingPopup:hover #popupHeader,
+        #floatingPopup:hover #popupRiotIdDropdown,
+        #floatingPopup:hover #popupFontDropdown,
+        #floatingPopup:hover #popupColorDropdown {
+            opacity: 1;
+            pointer-events: auto;
+            transition-delay: 0s;
+        }
+
+        /* 透過モード時の挙動を統合（透過モードでもホバー等で統合表示されるようにする） */
         #floatingPopup.transparent-mode {
             background: transparent !important;
             backdrop-filter: none !important;
@@ -258,14 +280,8 @@
         }
 
         #floatingPopup.transparent-mode #popupHeader {
-            opacity: 0;
-            transition: opacity 0.3s ease;
             background: transparent !important;
             border-bottom: none !important;
-        }
-
-        #floatingPopup.transparent-mode:hover #popupHeader {
-            opacity: 1;
         }
 
         #floatingPopup.transparent-mode #popupBody {
@@ -1708,7 +1724,7 @@
             const dropdown = document.getElementById('popupFontDropdown');
             const btn = document.getElementById('popupFontBtn');
             const isHidden = dropdown.classList.contains('hidden');
-            
+
             closeAllPopupMenus();
 
             if (isHidden) {
