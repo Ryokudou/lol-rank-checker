@@ -1241,6 +1241,14 @@
                         if (gnInput) gnInput.value = event.data.gameName;
                         const regInput = document.getElementById('region');
                         if (regInput) regInput.value = event.data.region;
+
+                        // ポップアップ側から「取得」が押された際にメイン画面でfetchを実行する
+                        if (event.data.triggerFetch && !isPopupWindow) {
+                            startFetch(false);
+                        }
+                    } else if (event.data.type === 'updateData') {
+                        currentData = event.data.payload;
+                        displayFinalResults();
                     }
                 };
             }
@@ -2113,8 +2121,8 @@
                     payload: currentData
                 });
 
-                // 通常モードでポップアップが既に表示されている場合
-                if (!document.getElementById('floatingPopup').classList.contains('hidden') && !isPopupWindow) {
+                // ポップアップが既に表示されている場合、またはポップアップモード自身の場合
+                if (isPopupWindow || !document.getElementById('floatingPopup').classList.contains('hidden')) {
                     renderPopupContent();
                 }
             } catch (err) {
