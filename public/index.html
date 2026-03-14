@@ -683,7 +683,7 @@
                                         <div class="flex justify-end mt-1 px-1">
                                             <button
                                                 onclick="document.getElementById('obsGuide').classList.toggle('hidden')"
-                                                class="text-[10px] text-gray-400 hover:text-blue-300 underline underline-offset-2 transition-colors">
+                                                class="text-[10px] text-red-500 font-bold hover:text-red-400 underline underline-offset-2 transition-colors">
                                                 OBSを使ってクロマキー以外で透過する場合
                                             </button>
                                         </div>
@@ -698,7 +698,7 @@
                                                         stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
-                                            <p class="pr-5 leading-relaxed text-red-500 font-bold">
+                                            <p class="pr-5 leading-relaxed">
                                                 Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURLをブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
                                                 ポップアップのRiot IDを選択し、ご自身のIDを入力してください。
                                             </p>
@@ -856,8 +856,8 @@
                                 class="w-7 h-4 bg-slate-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600">
                             </div>
                         </div>
-                        <span id="popupTimerLabel"
-                            class="text-[10px] font-bold text-gray-300 whitespace-nowrap" data-i18n="lblPopupRefresh">10分更新</span>
+                        <span id="popupTimerLabel" class="text-[10px] font-bold text-gray-300 whitespace-nowrap"
+                            data-i18n="lblPopupRefresh">10分更新</span>
                     </label>
                 </div>
 
@@ -878,7 +878,8 @@
                             <option value="euw1">EUW</option>
                         </select>
                         <button onclick="fetchFromPopup()"
-                            class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs py-1.5 rounded mt-1 font-bold" data-i18n="lblPopupFetchBtn">取得</button>
+                            class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs py-1.5 rounded mt-1 font-bold"
+                            data-i18n="lblPopupFetchBtn">取得</button>
                     </div>
                 </div>
 
@@ -903,7 +904,8 @@
                     style="background:#8b5cf6; margin-right:4px;" data-i18n="lblPopupTransparent">透過</button>
                 <button id="chromakeyBtn" onclick="toggleChromaKey()" class="btn-live-toggle"
                     style="background:#10b981; margin-right:4px;" data-i18n="lblPopupChroma">CHROMA</button>
-                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle" data-i18n="liveModeOff">LIVE MODE: OFF</button>
+                <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle"
+                    data-i18n="liveModeOff">LIVE MODE: OFF</button>
                 <button onclick="closeFloatingPopup()"
                     class="text-gray-400 hover:text-white transition-colors p-1 popup-close-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 close-btn-icon" fill="none"
