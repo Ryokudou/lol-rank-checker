@@ -241,9 +241,9 @@
             display: none;
         }
 
-        #popupHeader, 
-        #popupRiotIdDropdown, 
-        #popupFontDropdown, 
+        #popupHeader,
+        #popupRiotIdDropdown,
+        #popupFontDropdown,
         #popupColorDropdown {
             opacity: 0;
             pointer-events: none;
@@ -251,6 +251,10 @@
             transition-delay: 2s;
         }
 
+        #floatingPopup.force-show-ui #popupHeader,
+        #floatingPopup.force-show-ui #popupRiotIdDropdown,
+        #floatingPopup.force-show-ui #popupFontDropdown,
+        #floatingPopup.force-show-ui #popupColorDropdown,
         #floatingPopup:hover #popupHeader,
         #floatingPopup:hover #popupRiotIdDropdown,
         #floatingPopup:hover #popupFontDropdown,
@@ -420,10 +424,10 @@
         }
 
         .layout-live .cq-rank-icon {
-            /* 見切れ防止のため少しサイズ調整 */
-            height: 85cqh;
+            /* 見切れ防止とテキスト高さとの均衡調整のためサイズを最適化 */
+            height: 55cqh;
             width: auto;
-            max-width: 25cqw;
+            max-width: 20cqw;
             object-fit: contain;
             filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
             flex-shrink: 0;
@@ -710,7 +714,7 @@
                                                 </svg>
                                             </button>
                                             <p class="pr-5 leading-relaxed">
-                                                Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURLをブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
+                                                Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURL(https://lol-rank-checker.vercel.app/?mode=popup&live=1)をブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
                                                 ポップアップのRiot IDを選択し、ご自身のIDを入力してください。
                                             </p>
                                         </div>
@@ -1045,7 +1049,10 @@
 
         if (isPopupWindow) {
             document.body.classList.add('popup-window-mode');
-            document.getElementById('floatingPopup').classList.remove('hidden');
+            const popupEl = document.getElementById('floatingPopup');
+            popupEl.classList.remove('hidden');
+            // OBS等での初回読み込み時（データ未取得時）はUIを常時表示させるためのクラスを付与
+            popupEl.classList.add('force-show-ui');
         }
 
         const i18n = {
@@ -1639,27 +1646,40 @@
             const isChecked = el.checked;
             const mainToggle = document.getElementById('autoRefreshToggle');
             if (mainToggle) mainToggle.checked = isChecked;
-            toggleAutoRefresh();
+            toggleAutoRefresh(true);
             try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) { }
         }
 
-        function toggleAutoRefresh() {
-            const isChecked = document.getElementById('autoRefreshToggle').checked;
-            const timerLabel = document.getElementById('timerLabel');
-
+        function toggleAutoRefresh(fromSync = false) {
+            // メインとポップアップの両方のトグルの状態を確認し、いずれかがONならONとする
+            const mainToggle = document.getElementById('autoRefreshToggle');
             const popupToggle = document.getElementById('popupAutoRefreshToggle');
+            let isChecked = false;
+            
+            if (mainToggle && mainToggle.checked) isChecked = true;
+            if (popupToggle && popupToggle.checked) isChecked = true;
+
+            // 両方の外見上のチェック状態を同期
+            if (mainToggle) mainToggle.checked = isChecked;
             if (popupToggle) popupToggle.checked = isChecked;
 
+            const timerLabel = document.getElementById('timerLabel');
+
             if (isChecked) {
-                nextRefreshTime = Date.now() + REFRESH_INTERVAL_MS;
-                lastTickTime = Date.now();
-                refreshTimerId = setInterval(updateTimerAndFetch, 1000);
-                updateTimerAndFetch();
-                timerLabel.classList.remove('hidden');
+                // すでにタイマーが動いている場合は再起動しない
+                if (!refreshTimerId) {
+                    nextRefreshTime = Date.now() + REFRESH_INTERVAL_MS;
+                    lastTickTime = Date.now();
+                    refreshTimerId = setInterval(updateTimerAndFetch, 1000);
+                    updateTimerAndFetch();
+                }
+                if (timerLabel) timerLabel.classList.remove('hidden');
             } else {
                 if (refreshTimerId) { clearInterval(refreshTimerId); refreshTimerId = null; }
-                timerLabel.classList.add('hidden');
-                timerLabel.innerText = '';
+                if (timerLabel) {
+                    timerLabel.classList.add('hidden');
+                    timerLabel.innerText = '';
+                }
 
                 const pt = document.getElementById('popupTimerLabel');
                 const lang = document.getElementById('langSelect').value;
@@ -1670,6 +1690,11 @@
                     pt.classList.remove('text-blue-400', 'font-mono');
                     pt.classList.add('text-gray-300');
                 }
+            }
+
+            // toggleAutoRefreshが直接呼ばれた場合のみブロードキャストを送信（無限ループ防止）
+            if (!fromSync) {
+                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) { }
             }
         }
 
@@ -1852,8 +1877,8 @@
         function updateTimerAndFetch() {
             const now = Date.now();
 
-            // スリープからの復帰検知 (1秒ごとのTickが10秒以上遅れた場合)
-            if (lastTickTime !== 0 && (now - lastTickTime) > 10000) {
+            // スリープからの復帰検知 (1秒ごとのTickが5分=300000ms以上遅れた場合)
+            if (lastTickTime !== 0 && (now - lastTickTime) > 300000) {
                 console.log("[Monitor] Woke up from sleep. Turning off auto refresh.");
 
                 const mainToggle = document.getElementById('autoRefreshToggle');
@@ -1862,7 +1887,6 @@
                 if (popupToggle) popupToggle.checked = false;
 
                 toggleAutoRefresh();
-
                 try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: false }); } catch (e) { }
                 return;
             }
@@ -1978,6 +2002,13 @@
 
         function renderPopupContent() {
             if (!currentData) return;
+            
+            // データが取得できたらUI常時表示を解除し、ホバー仕様に戻す
+            const popupEl = document.getElementById('floatingPopup');
+            if (popupEl.classList.contains('force-show-ui')) {
+                popupEl.classList.remove('force-show-ui');
+            }
+
             const container = document.getElementById('popupContentContainer');
             const { tier, rank, lp, wins, losses, history } = currentData;
 
@@ -2367,14 +2398,23 @@
         })();
 
         window.addEventListener('online', () => {
-            console.log("[Monitor] Network is back online. Resuming data sync.");
-            if (currentData && currentData.account) {
-                // ポップアップウィンドウは別画面でデータを受け取るだけなので、
-                // メインウィンドウ側でのみ再取得処理をキックする
-                if (!isPopupWindow) {
-                    console.log("[Monitor] Forcing data refresh after coming online.");
-                    startFetch(true);
-                }
+            console.log("[Monitor] Network is back online.");
+            
+            const now = Date.now();
+            // ネットワーク復帰時、前回のタイマーTick処理から1分(60000ms)以上ズレていた場合のみ
+            // サスペンド（長時間の切断/スリープ）があったと判定してタイマーをOFFにする
+            if (lastTickTime !== 0 && (now - lastTickTime) > 60000) {
+                console.log("[Monitor] Network reconnected after a long delay (> 1 min). Turning off auto refresh to prevent unwanted loops.");
+                
+                const mainToggle = document.getElementById('autoRefreshToggle');
+                const popupToggle = document.getElementById('popupAutoRefreshToggle');
+                if (mainToggle) mainToggle.checked = false;
+                if (popupToggle) popupToggle.checked = false;
+
+                toggleAutoRefresh(true);
+                try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: false }); } catch (e) { }
+            } else {
+                console.log("[Monitor] Network reconnection gap was less than 1 min. Auto refresh remains active if it was ON.");
             }
         });
     </script>
