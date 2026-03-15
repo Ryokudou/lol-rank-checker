@@ -321,8 +321,8 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding: 0.5cqh 2cqw;
-            /* 上下に余白を追加（多すぎたため10cqhから2cqhへ、さらに0.5cqhまで縮小） */
+            padding: 2cqh 2cqw;
+            /* 上下に約2mmの余白を追加 */
             box-sizing: border-box;
             align-items: center;
             justify-content: center;
@@ -1361,7 +1361,7 @@
                     renderPopupContent();
                     try {
                         if (isLiveMode) window.resizeTo(836, 225);
-                        else window.resizeTo(436, 530);
+                        else window.resizeTo(436, 485);
                     } catch (e) { }
                 } else if (event.data.type === 'changeColor') {
                     currentStatsColor = event.data.color;
@@ -1995,7 +1995,7 @@
             } else {
                 try {
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 530);
+                    else window.resizeTo(436, 485);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
