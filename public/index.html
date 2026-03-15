@@ -358,7 +358,7 @@
         }
 
         .layout-normal .cq-rank-text {
-            font-size: 14cqh;
+            font-size: 10cqh; /* 14cqh -> 10cqh */
             width: 100%;
             text-align: center;
             white-space: nowrap;
@@ -369,7 +369,7 @@
         }
 
         .layout-normal .cq-lp-text {
-            font-size: 14cqh;
+            font-size: 10cqh; /* 14cqh -> 10cqh */
             line-height: 1;
             font-weight: 900;
             margin-bottom: 2cqh;
@@ -390,14 +390,14 @@
         }
 
         .layout-normal .cq-stat-label {
-            font-size: 12cqh;
+            font-size: 8cqh; /* 12cqh -> 8cqh */
             margin-bottom: 0.5cqh;
             font-weight: bold;
             line-height: 1;
         }
 
         .layout-normal .cq-stat-value {
-            font-size: 9cqh;
+            font-size: 8cqh; /* 9cqh -> 8cqh */
             font-weight: 800;
             line-height: 1;
             color: white;
@@ -1650,18 +1650,29 @@
             try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) { }
         }
 
-        function toggleAutoRefresh(fromSync = false) {
-            // メインとポップアップの両方のトグルの状態を確認し、いずれかがONならONとする
+        function toggleAutoRefresh(forceState = null) {
             const mainToggle = document.getElementById('autoRefreshToggle');
             const popupToggle = document.getElementById('popupAutoRefreshToggle');
+            
+            // forceStateが渡されている場合はそれを優先、無ければメインまたはポップアップのどちらかが起因で呼ばれたとして
+            // イベントの発火元（チェックがついているか）を確認して同期する。
+            // 重要なのは "両方のOR" ではなく、「操作対象のトグル」と同じ状態に揃えること。
+            // event等から直接取得できないため、DOMの状態から「どちらかが変更されているはずなのでそれに揃える」アプローチはバグる。
+            // => syncAutoRefreshToggle で必ず forceState(isChecked) を渡すようにして解決する。
+
             let isChecked = false;
             
-            if (mainToggle && mainToggle.checked) isChecked = true;
-            if (popupToggle && popupToggle.checked) isChecked = true;
+            if (forceState !== null) {
+                isChecked = forceState;
+            } else {
+                // 初期ロード時などの対策（通常は引数で渡させる）
+                if (mainToggle && mainToggle.checked) isChecked = true;
+                else if (popupToggle && popupToggle.checked) isChecked = true;
+            }
 
             // 両方の外見上のチェック状態を同期
-            if (mainToggle) mainToggle.checked = isChecked;
-            if (popupToggle) popupToggle.checked = isChecked;
+            if (mainToggle && mainToggle.checked !== isChecked) mainToggle.checked = isChecked;
+            if (popupToggle && popupToggle.checked !== isChecked) popupToggle.checked = isChecked;
 
             const timerLabel = document.getElementById('timerLabel');
 
@@ -2002,7 +2013,7 @@
 
         function renderPopupContent() {
             if (!currentData) return;
-            
+
             // データが取得できたらUI常時表示を解除し、ホバー仕様に戻す
             const popupEl = document.getElementById('floatingPopup');
             if (popupEl.classList.contains('force-show-ui')) {
@@ -2399,19 +2410,15 @@
 
         window.addEventListener('online', () => {
             console.log("[Monitor] Network is back online.");
-            
+
             const now = Date.now();
             // ネットワーク復帰時、前回のタイマーTick処理から1分(60000ms)以上ズレていた場合のみ
             // サスペンド（長時間の切断/スリープ）があったと判定してタイマーをOFFにする
             if (lastTickTime !== 0 && (now - lastTickTime) > 60000) {
                 console.log("[Monitor] Network reconnected after a long delay (> 1 min). Turning off auto refresh to prevent unwanted loops.");
-                
-                const mainToggle = document.getElementById('autoRefreshToggle');
-                const popupToggle = document.getElementById('popupAutoRefreshToggle');
-                if (mainToggle) mainToggle.checked = false;
-                if (popupToggle) popupToggle.checked = false;
 
-                toggleAutoRefresh(true);
+                // ネットワーク復帰時の強制停止では false を渡して確実にOFFにする
+                toggleAutoRefresh(false);
                 try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: false }); } catch (e) { }
             } else {
                 console.log("[Monitor] Network reconnection gap was less than 1 min. Auto refresh remains active if it was ON.");
