@@ -321,8 +321,8 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding: 2cqh 2cqw;
-            /* 上下に余白を追加（多すぎたため10cqhから2cqhへ縮小） */
+            padding: 0.5cqh 2cqw;
+            /* 上下に余白を追加（多すぎたため10cqhから2cqhへ、さらに0.5cqhまで縮小） */
             box-sizing: border-box;
             align-items: center;
             justify-content: center;
@@ -335,7 +335,7 @@
             justify-content: center;
             width: 100%;
             overflow: hidden;
-            padding-bottom: 0.5cqh;
+            padding-bottom: 0px;
         }
 
         .layout-normal .cq-rank-icon {
@@ -358,7 +358,8 @@
         }
 
         .layout-normal .cq-rank-text {
-            font-size: 10cqh; /* 14cqh -> 10cqh */
+            font-size: 10cqh;
+            /* 14cqh -> 10cqh */
             width: 100%;
             text-align: center;
             white-space: nowrap;
@@ -369,7 +370,8 @@
         }
 
         .layout-normal .cq-lp-text {
-            font-size: 10cqh; /* 14cqh -> 10cqh */
+            font-size: 10cqh;
+            /* 14cqh -> 10cqh */
             line-height: 1;
             font-weight: 900;
             margin-bottom: 2cqh;
@@ -390,14 +392,16 @@
         }
 
         .layout-normal .cq-stat-label {
-            font-size: 8cqh; /* 12cqh -> 8cqh */
+            font-size: 8cqh;
+            /* 12cqh -> 8cqh */
             margin-bottom: 0.5cqh;
             font-weight: bold;
             line-height: 1;
         }
 
         .layout-normal .cq-stat-value {
-            font-size: 8cqh; /* 9cqh -> 8cqh */
+            font-size: 8cqh;
+            /* 9cqh -> 8cqh */
             font-weight: 800;
             line-height: 1;
             color: white;
@@ -1273,7 +1277,7 @@
                         const mainToggle = document.getElementById('autoRefreshToggle');
                         if (mainToggle && mainToggle.checked !== event.data.isChecked) {
                             mainToggle.checked = event.data.isChecked;
-                            toggleAutoRefresh();
+                            toggleAutoRefresh(event.data.isChecked);
                         }
                     } else if (event.data.type === 'changeLanguage') {
                         const langSelect = document.getElementById('langSelect');
@@ -1341,7 +1345,14 @@
             }
 
             broadcastChannel.onmessage = (event) => {
-                if (event.data.type === 'updateData') {
+                if (event.data.type === 'toggleAutoRefresh') {
+                    const popupToggle = document.getElementById('popupAutoRefreshToggle');
+                    if (popupToggle && popupToggle.checked !== event.data.isChecked) {
+                        popupToggle.checked = event.data.isChecked;
+                        // ポップアップ側でも内部タイマーと同期するため状態を適用
+                        toggleAutoRefresh(event.data.isChecked);
+                    }
+                } else if (event.data.type === 'updateData') {
                     currentData = event.data.payload;
                     renderPopupContent();
                 } else if (event.data.type === 'changeMode') {
@@ -1646,14 +1657,14 @@
             const isChecked = el.checked;
             const mainToggle = document.getElementById('autoRefreshToggle');
             if (mainToggle) mainToggle.checked = isChecked;
-            toggleAutoRefresh(true);
+            toggleAutoRefresh(isChecked);
             try { broadcastChannel.postMessage({ type: 'toggleAutoRefresh', isChecked: isChecked }); } catch (e) { }
         }
 
         function toggleAutoRefresh(forceState = null) {
             const mainToggle = document.getElementById('autoRefreshToggle');
             const popupToggle = document.getElementById('popupAutoRefreshToggle');
-            
+
             // forceStateが渡されている場合はそれを優先、無ければメインまたはポップアップのどちらかが起因で呼ばれたとして
             // イベントの発火元（チェックがついているか）を確認して同期する。
             // 重要なのは "両方のOR" ではなく、「操作対象のトグル」と同じ状態に揃えること。
@@ -1661,7 +1672,7 @@
             // => syncAutoRefreshToggle で必ず forceState(isChecked) を渡すようにして解決する。
 
             let isChecked = false;
-            
+
             if (forceState !== null) {
                 isChecked = forceState;
             } else {
