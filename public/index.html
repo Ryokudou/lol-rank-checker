@@ -1361,7 +1361,7 @@
                     renderPopupContent();
                     try {
                         if (isLiveMode) window.resizeTo(836, 225);
-                        else window.resizeTo(436, 396);
+                        else window.resizeTo(436, 530);
                     } catch (e) { }
                 } else if (event.data.type === 'changeColor') {
                     currentStatsColor = event.data.color;
@@ -1995,7 +1995,7 @@
             } else {
                 try {
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 650);
+                    else window.resizeTo(436, 530);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
