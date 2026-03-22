@@ -344,7 +344,7 @@
         }
 
         .layout-normal .section-icon {
-            flex: 0 0 40%;
+            flex: 0 0 45%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -368,13 +368,12 @@
             align-items: center;
             justify-content: flex-start;
             width: 100%;
-            gap: 0.5cqh;
-            padding-top: 0;
+            gap: 1cqh;
+            padding-top: 1cqh;
         }
 
         .layout-normal .cq-rank-text {
-            font-size: 10cqh;
-            /* 14cqh -> 10cqh */
+            font-size: 12cqh;
             width: 100%;
             text-align: center;
             white-space: nowrap;
@@ -385,11 +384,10 @@
         }
 
         .layout-normal .cq-lp-text {
-            font-size: 10cqh;
-            /* 14cqh -> 10cqh */
+            font-size: 12cqh;
             line-height: 1;
             font-weight: 900;
-            margin-bottom: 2cqh;
+            margin-bottom: 3cqh;
             text-shadow: 0 0 10px currentColor;
         }
 
@@ -407,16 +405,14 @@
         }
 
         .layout-normal .cq-stat-label {
-            font-size: 8cqh;
-            /* 12cqh -> 8cqh */
+            font-size: 9cqh;
             margin-bottom: 0.5cqh;
             font-weight: bold;
             line-height: 1;
         }
 
         .layout-normal .cq-stat-value {
-            font-size: 8cqh;
-            /* 9cqh -> 8cqh */
+            font-size: 10cqh;
             font-weight: 800;
             line-height: 1;
             color: white;
@@ -859,7 +855,7 @@
 
     <!-- Draggable Popup (Shared with Popup Mode) -->
     <div id="floatingPopup" class="hidden fixed z-50 glass-panel rounded-xl"
-        style="top: 100px; left: 50%; transform: translateX(-50%); width: 420px; height: 520px;">
+        style="top: 100px; left: 50%; transform: translateX(-50%); width: 380px; height: 400px;">
         <div id="popupHeader">
             <div class="flex items-center gap-2 flex-wrap">
                 <div class="flex items-center gap-1">
@@ -2004,13 +2000,13 @@
                     popup.style.width = '820px';
                     popup.style.height = '175px';
                 } else {
-                    popup.style.width = '420px';
-                    popup.style.height = '550px';
+                    popup.style.width = '380px';
+                    popup.style.height = '400px';
                 }
             } else {
                 try {
                     if (isLiveMode) window.resizeTo(836, 225);
-                    else window.resizeTo(436, 485);
+                    else window.resizeTo(396, 440);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
