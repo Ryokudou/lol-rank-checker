@@ -549,6 +549,13 @@
             background: transparent;
         }
 
+        .is-live-mode #popupRiotIdDropdown,
+        .is-live-mode #popupFontDropdown,
+        .is-live-mode #popupColorDropdown {
+            max-height: 90px;
+            overflow-y: auto;
+        }
+
         .block-win {
             background-color: #3b82f6;
             box-shadow: 0 0 2px rgba(59, 130, 246, 0.4);
@@ -1419,8 +1426,8 @@
                     updateModeBtn();
                     renderPopupContent();
                     try {
-                        if (isLiveMode) window.resizeTo(836, 225);
-                        else window.resizeTo(436, 485);
+                        if (isLiveMode) window.resizeTo(902, 134);
+                        else window.resizeTo(396, 440);
                     } catch (e) { }
                 } else if (event.data.type === 'changeColor') {
                     currentStatsColor = event.data.color;
