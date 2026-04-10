@@ -794,7 +794,7 @@
                                             <p class="pr-5 leading-relaxed">
                                                 Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURL(　https://lol-rank-checker.vercel.app/?mode=popup&live=1　)をブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
                                                 ポップアップのRiot IDを選択し、ご自身のIDを入力してください。<br>
-                                                ライブモードON時は、幅902高さ134<br>
+                                                ライブモードON時は、幅1173高さ134<br>
                                                 ライブモードOFF時は、幅500高さ500くらいがちょうどいいサイズだと思います。
                                             </p>
                                         </div>
@@ -1468,7 +1468,7 @@
                     renderPopupContent();
                     try {
                         if (isLiveMode) {
-                            window.resizeBy(902 - window.innerWidth, 134 - window.innerHeight);
+                            window.resizeBy(1173 - window.innerWidth, 134 - window.innerHeight);
                         } else {
                             window.resizeBy(396 - window.innerWidth, 440 - window.innerHeight);
                         }
@@ -2027,7 +2027,7 @@
             listObj.classList.remove('hidden');
             listObj.classList.add('flex');
 
-            listObj.innerHTML = '<div class="text-[9px] text-slate-400 mb-1 font-bold w-full text-center">★</div>';
+            listObj.innerHTML = '<div class="text-[10px] text-slate-400 mb-1 font-bold w-full px-2 text-left">★</div>';
             favorites.forEach(item => {
                 const el = document.createElement('button');
                 el.className = 'w-full text-left text-[10px] text-white hover:bg-slate-700 px-2 py-1.5 rounded truncate max-w-[90px]';
@@ -2154,7 +2154,7 @@
                 return;
             }
 
-            const width = 902;
+            const width = 1173;
             const height = 134;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
@@ -2196,7 +2196,7 @@
             const popup = document.getElementById('floatingPopup');
             if (!isPopupWindow) {
                 if (isLiveMode) {
-                    popup.style.width = '902px';
+                    popup.style.width = '1173px';
                     popup.style.height = '134px';
                 } else {
                     popup.style.width = '380px';
@@ -2205,7 +2205,7 @@
             } else {
                 try {
                     if (isLiveMode) {
-                        window.resizeBy(902 - window.innerWidth, 134 - window.innerHeight);
+                        window.resizeBy(1173 - window.innerWidth, 134 - window.innerHeight);
                     } else {
                         window.resizeBy(396 - window.innerWidth, 440 - window.innerHeight);
                     }
