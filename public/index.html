@@ -176,7 +176,8 @@
 
         .history-content {
             cursor: pointer;
-            padding: 0.5rem 0.75rem 0.5rem 0.5rem; /* 縦幅を2倍程度に拡大 */
+            padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+            /* 縦幅を2倍程度に拡大 */
             display: flex;
             align-items: center;
             gap: 0.25rem;
@@ -555,15 +556,6 @@
         .is-live-mode #popupColorDropdown {
             max-height: 90px;
             overflow-y: auto;
-            overflow-x: hidden;
-            width: max-content;
-            padding-right: 18px;
-            /* スクロールバー用のマージン */
-        }
-
-        .is-live-mode #popupRiotIdDropdown .w-48 {
-            width: 14rem;
-            /* 幅を少し広げてユーザー名の見切れを防ぐ */
         }
 
         .block-win {
@@ -1436,8 +1428,11 @@
                     updateModeBtn();
                     renderPopupContent();
                     try {
-                        if (isLiveMode) window.resizeTo(902, 134);
-                        else window.resizeTo(396, 440);
+                        if (isLiveMode) {
+                            window.resizeBy(902 - window.innerWidth, 134 - window.innerHeight);
+                        } else {
+                            window.resizeBy(396 - window.innerWidth, 440 - window.innerHeight);
+                        }
                     } catch (e) { }
                 } else if (event.data.type === 'changeColor') {
                     currentStatsColor = event.data.color;
@@ -2170,8 +2165,11 @@
                 }
             } else {
                 try {
-                    if (isLiveMode) window.resizeTo(902, 134);
-                    else window.resizeTo(396, 440);
+                    if (isLiveMode) {
+                        window.resizeBy(902 - window.innerWidth, 134 - window.innerHeight);
+                    } else {
+                        window.resizeBy(396 - window.innerWidth, 440 - window.innerHeight);
+                    }
                 } catch (e) {
                     console.log('Window resize blocked by browser');
                 }
