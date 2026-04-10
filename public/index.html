@@ -455,7 +455,7 @@
 
         .layout-live .cq-rank-icon {
             /* 見切れ防止とテキスト高さとの均衡調整のためサイズを最適化 */
-            height: 55cqh;
+            height: 90cqh;
             width: auto;
             max-width: 20cqw;
             object-fit: contain;
@@ -482,8 +482,8 @@
         }
 
         .layout-live .cq-rank-text {
-            /* 見切れ防止のためフォントサイズ調整: 34cqh -> 30cqh */
-            font-size: 30cqh;
+            /* 見切れ防止のためフォントサイズ調整: 34cqh -> 48cqh */
+            font-size: 48cqh;
             font-weight: 900;
             white-space: nowrap;
             text-shadow: 0 0 10px currentColor;
@@ -492,8 +492,8 @@
         }
 
         .layout-live .cq-lp-text {
-            /* 見切れ防止のためフォントサイズ調整: 34cqh -> 30cqh */
-            font-size: 30cqh;
+            /* 見切れ防止のためフォントサイズ調整: 34cqh -> 48cqh */
+            font-size: 48cqh;
             font-weight: 900;
             line-height: 1;
             text-shadow: 0 0 10px currentColor;
@@ -514,14 +514,14 @@
 
         /* フォントサイズ微調整 */
         .layout-live .cq-stat-label {
-            font-size: 18cqh;
+            font-size: 28cqh;
             opacity: 0.9;
             font-weight: bold;
             line-height: 1;
         }
 
         .layout-live .cq-stat-value {
-            font-size: 18cqh;
+            font-size: 28cqh;
             color: white;
             font-weight: 800;
             line-height: 1;
@@ -531,12 +531,12 @@
             display: flex;
             align-items: center;
             gap: 0;
-            height: 16cqh;
+            height: 24cqh;
             margin-left: 5px;
         }
 
         .layout-live .history-block {
-            width: 8cqh;
+            width: 14cqh;
             min-width: 2px;
             height: 100%;
             border-radius: 2px;
@@ -544,7 +544,7 @@
         }
 
         .layout-live .history-spacer {
-            width: 2cqh;
+            width: 3cqh;
             height: 100%;
             background: transparent;
         }
@@ -922,7 +922,8 @@
                     <!-- Riot ID Input Dropdown -->
                     <div id="popupRiotIdDropdown"
                         class="hidden absolute top-full left-0 p-3 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl z-[9000] flex flex-row gap-3 transition-all glass-panel">
-                        <div id="popupRiotFavoritesList" class="hidden flex-col gap-1 pr-3 border-r border-slate-600/50 min-w-[80px]">
+                        <div id="popupRiotFavoritesList"
+                            class="hidden flex-col gap-1 pr-3 border-r border-slate-600/50 min-w-[80px]">
                             <!-- Favorites inserted by JS -->
                         </div>
                         <div class="flex flex-col gap-2 w-48 shrink-0">
@@ -1054,9 +1055,9 @@
         function toggleTransparentMode() {
             transparentLevel = (transparentLevel + 1) % 3;
             const popupEl = document.getElementById('floatingPopup');
-            
+
             popupEl.classList.remove('transparent-mode', 'semi-transparent-mode');
-            
+
             if (transparentLevel === 1) {
                 popupEl.classList.add('semi-transparent-mode');
                 document.getElementById('transparentBtn').innerText = t('lblPopupTransparent') + "(半)";
