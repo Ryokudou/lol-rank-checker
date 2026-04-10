@@ -554,8 +554,9 @@
         .is-live-mode #popupRiotIdDropdown,
         .is-live-mode #popupFontDropdown,
         .is-live-mode #popupColorDropdown {
-            max-height: 90px;
+            max-height: 180px; /* 縦幅を2倍（90px -> 180px）に拡大 */
             overflow-y: auto;
+            overflow-x: hidden; /* 横スクロールバーを非表示 */
         }
 
         .block-win {
