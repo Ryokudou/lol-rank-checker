@@ -746,7 +746,7 @@
                                             <p class="pr-5 leading-relaxed">
                                                 Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURL(　https://lol-rank-checker.vercel.app/?mode=popup&live=1　)をブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
                                                 ポップアップのRiot IDを選択し、ご自身のIDを入力してください。<br>
-                                                ライブモードON時は、幅694高さ134<br>
+                                                ライブモードON時は、幅902高さ134<br>
                                                 ライブモードOFF時は、幅500高さ500くらいがちょうどいいサイズだと思います。
                                             </p>
                                         </div>
@@ -2103,7 +2103,7 @@
                 return;
             }
 
-            const width = 694;
+            const width = 902;
             const height = 134;
             const left = (screen.width - width) / 2;
             const top = (screen.height - height) / 2;
@@ -2145,7 +2145,7 @@
             const popup = document.getElementById('floatingPopup');
             if (!isPopupWindow) {
                 if (isLiveMode) {
-                    popup.style.width = '694px';
+                    popup.style.width = '902px';
                     popup.style.height = '134px';
                 } else {
                     popup.style.width = '380px';
@@ -2153,7 +2153,7 @@
                 }
             } else {
                 try {
-                    if (isLiveMode) window.resizeTo(694, 134);
+                    if (isLiveMode) window.resizeTo(902, 134);
                     else window.resizeTo(396, 440);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
