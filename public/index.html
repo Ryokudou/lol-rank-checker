@@ -176,7 +176,7 @@
 
         .history-content {
             cursor: pointer;
-            padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+            padding: 0.5rem 0.75rem 0.5rem 0.5rem; /* 縦幅を2倍程度に拡大 */
             display: flex;
             align-items: center;
             gap: 0.25rem;
@@ -187,13 +187,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1;
             transition: all 0.2s;
         }
@@ -1436,10 +1436,7 @@
                     updateModeBtn();
                     renderPopupContent();
                     try {
-                        if (isLiveMode) {
-                            const currentH = window.outerHeight;
-                            window.resizeTo(902, currentH > 134 ? currentH : 134);
-                        }
+                        if (isLiveMode) window.resizeTo(902, 134);
                         else window.resizeTo(396, 440);
                     } catch (e) { }
                 } else if (event.data.type === 'changeColor') {
@@ -1710,7 +1707,7 @@
 
             history.forEach(item => {
                 const chip = document.createElement('div');
-                chip.className = 'history-chip text-[10px] text-blue-200 rounded-full shrink-0';
+                chip.className = 'history-chip text-sm text-blue-200 rounded-full shrink-0 flex items-center';
                 const nameEsc = item.name.replace(/'/g, "\\'");
                 const tagEsc = item.tag.replace(/'/g, "\\'");
                 const regionEsc = item.region;
@@ -2166,22 +2163,14 @@
             if (!isPopupWindow) {
                 if (isLiveMode) {
                     popup.style.width = '902px';
-                    // もしポップアップ自体がCSSや手動でリサイズされている場合を考慮
-                    if (parseInt(popup.style.height) > 134) {
-                        // 高さを維持
-                    } else {
-                        popup.style.height = '134px';
-                    }
+                    popup.style.height = '134px';
                 } else {
                     popup.style.width = '380px';
                     popup.style.height = '400px';
                 }
             } else {
                 try {
-                    if (isLiveMode) {
-                        const currentH = window.outerHeight;
-                        window.resizeTo(902, currentH > 134 ? currentH : 134);
-                    }
+                    if (isLiveMode) window.resizeTo(902, 134);
                     else window.resizeTo(396, 440);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
