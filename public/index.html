@@ -551,14 +551,22 @@
             background: transparent;
         }
 
-        .is-live-mode #popupRiotIdDropdown,
         .is-live-mode #popupFontDropdown,
         .is-live-mode #popupColorDropdown {
             max-height: calc(100vh - 45px);
-            /* ウィンドウ枠内に収め、縦スクロールバーを有効にする */
             overflow-y: auto;
             overflow-x: hidden;
-            /* 横スクロールバーを非表示 */
+        }
+
+        .is-live-mode #popupRiotIdDropdown {
+            width: max-content;
+        }
+
+        .is-live-mode #popupRiotFavoritesList {
+            max-height: calc(100vh - 45px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 8px;
         }
 
         .block-win {
