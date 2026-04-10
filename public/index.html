@@ -1436,7 +1436,10 @@
                     updateModeBtn();
                     renderPopupContent();
                     try {
-                        if (isLiveMode) window.resizeTo(902, 134);
+                        if (isLiveMode) {
+                            const currentH = window.outerHeight;
+                            window.resizeTo(902, currentH > 134 ? currentH : 134);
+                        }
                         else window.resizeTo(396, 440);
                     } catch (e) { }
                 } else if (event.data.type === 'changeColor') {
@@ -1707,7 +1710,7 @@
 
             history.forEach(item => {
                 const chip = document.createElement('div');
-                chip.className = 'history-chip text-[10px] text-blue-200 rounded-full';
+                chip.className = 'history-chip text-[10px] text-blue-200 rounded-full shrink-0';
                 const nameEsc = item.name.replace(/'/g, "\\'");
                 const tagEsc = item.tag.replace(/'/g, "\\'");
                 const regionEsc = item.region;
@@ -2163,14 +2166,22 @@
             if (!isPopupWindow) {
                 if (isLiveMode) {
                     popup.style.width = '902px';
-                    popup.style.height = '134px';
+                    // もしポップアップ自体がCSSや手動でリサイズされている場合を考慮
+                    if (parseInt(popup.style.height) > 134) {
+                        // 高さを維持
+                    } else {
+                        popup.style.height = '134px';
+                    }
                 } else {
                     popup.style.width = '380px';
                     popup.style.height = '400px';
                 }
             } else {
                 try {
-                    if (isLiveMode) window.resizeTo(902, 134);
+                    if (isLiveMode) {
+                        const currentH = window.outerHeight;
+                        window.resizeTo(902, currentH > 134 ? currentH : 134);
+                    }
                     else window.resizeTo(396, 440);
                 } catch (e) {
                     console.log('Window resize blocked by browser');
