@@ -788,7 +788,7 @@
                                         <div class="flex justify-end mt-1 px-1">
                                             <button
                                                 onclick="document.getElementById('obsGuide').classList.toggle('hidden')"
-                                                class="text-[10px] text-red-500 font-bold hover:text-red-400 underline underline-offset-2 transition-colors">
+                                                class="text-[10px] text-red-500 font-bold hover:text-red-400 underline underline-offset-2 transition-colors" data-i18n="lblObsGuideBtn">
                                                 OBSを使ってクロマキー以外で透過する場合
                                             </button>
                                         </div>
@@ -803,7 +803,7 @@
                                                         stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
-                                            <p class="pr-5 leading-relaxed">
+                                            <p class="pr-5 leading-relaxed" data-i18n-html="obsGuideText">
                                                 Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURL(　https://lol-rank-checker.vercel.app/?mode=popup&live=1　)をブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>
                                                 ポップアップのRiot IDを選択し、ご自身のIDを入力してください。<br>
                                                 ライブモードON時は、幅800高さ120くらい<br>
@@ -1213,7 +1213,9 @@
                 lblPopupRiotIdBtn: "Riot ID",
                 lblPopupFetchBtn: "取得",
                 lblPopupTransparent: "透過",
-                lblPopupChroma: "CHROMA"
+                lblPopupChroma: "CHROMA",
+                lblObsGuideBtn: "OBSを使ってクロマキー以外で透過する場合",
+                obsGuideText: "Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURL(　https://lol-rank-checker.vercel.app/?mode=popup&live=1　)をブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>ポップアップのRiot IDを選択し、ご自身のIDを入力してください。<br>ライブモードON時は、幅800高さ120くらい<br>ライブモードOFF時は、幅500高さ500くらいがちょうどいいサイズだと思います。"
             },
             en: {
                 appTitle: "LoL Rank Checker",
@@ -1255,7 +1257,9 @@
                 lblPopupRiotIdBtn: "Riot ID",
                 lblPopupFetchBtn: "Search",
                 lblPopupTransparent: "Transp.",
-                lblPopupChroma: "CHROMA"
+                lblPopupChroma: "CHROMA",
+                lblObsGuideBtn: "OBS Transparency (Non-Chroma Key) Guide",
+                obsGuideText: "Due to web browser specifications, rendering a transparent background defaults to white. To fix this, load the popup URL ( https://lol-rank-checker.vercel.app/?mode=popup&live=1 ) in OBS as a Browser Source, right-click and select 'Interact' to operate it.<br>Click 'Riot ID' in the popup and enter your ID.<br>Recommended sizes:<br>Live Mode ON: Width 800, Height 120<br>Live Mode OFF: Width 500, Height 500"
             },
             ko: {
                 appTitle: "LoL 랭크 체커",
@@ -1297,7 +1301,9 @@
                 lblPopupRiotIdBtn: "Riot ID",
                 lblPopupFetchBtn: "검색",
                 lblPopupTransparent: "투명",
-                lblPopupChroma: "크로마"
+                lblPopupChroma: "크로마",
+                lblObsGuideBtn: "OBS를 사용하여 크로마키 없이 투명화하는 방법",
+                obsGuideText: "크롬 등 웹 브라우저의 특성상 투명한 배경을 표시할 때 기본적으로 흰색 배경이 사용됩니다. 이를 방지하려면 OBS에서 팝업 URL ( https://lol-rank-checker.vercel.app/?mode=popup&live=1 )을 브라우저 소스로 불러온 후 메뉴에서 '상호작용'을 선택하여 조작해 주세요.<br>팝업에서 'Riot ID'를 선택하고 본인의 ID를 입력하세요.<br>권장 크기:<br>라이브 모드 ON: 너비 800, 높이 120<br>라이브 모드 OFF: 너비 500, 높이 500 정도가 적당합니다."
             },
             zh: {
                 appTitle: "LoL 段位查询器",
@@ -1339,7 +1345,9 @@
                 lblPopupRiotIdBtn: "Riot ID",
                 lblPopupFetchBtn: "获取",
                 lblPopupTransparent: "透明",
-                lblPopupChroma: "绿幕"
+                lblPopupChroma: "绿幕",
+                lblObsGuideBtn: "不使用绿幕实现OBS透明度指南",
+                obsGuideText: "由于Chrome等网页浏览器的特性，渲染透明背景时默认会显示白色底色。为了解决这个问题，请在OBS中将弹出窗口URL（ https://lol-rank-checker.vercel.app/?mode=popup&live=1 ）添加为浏览器源，右键点击选择“交互”进行操作。<br>在弹出窗口中选择“Riot ID”并输入您的ID。<br>推荐尺寸：<br>实时模式 开启：宽度 800，高度 120左右<br>实时模式 关闭：宽度 500，高度 500左右"
             }
         };
 
@@ -1562,6 +1570,11 @@
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (texts[key]) el.placeholder = texts[key];
+            });
+
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.getAttribute('data-i18n-html');
+                if (texts[key]) el.innerHTML = texts[key];
             });
 
             // Region Options
