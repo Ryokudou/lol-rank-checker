@@ -599,6 +599,16 @@
             padding-right: 8px;
         }
 
+        body:not(.is-live-mode) .riot-id-wrapper {
+            position: static !important;
+        }
+
+        body:not(.is-live-mode) #popupRiotIdDropdown {
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            top: 40px !important;
+        }
+
         .block-win {
             background-color: #3b82f6;
             box-shadow: 0 0 2px rgba(59, 130, 246, 0.4);
@@ -958,7 +968,7 @@
                     </label>
                 </div>
 
-                <div class="flex items-center gap-1 mr-1 relative">
+                <div class="flex items-center gap-1 mr-1 relative riot-id-wrapper">
                     <div id="popupFavoriteBtn" class="favorite-btn" onclick="togglePopupFavorite(event)"
                         title="お気に入り登録">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
