@@ -554,6 +554,13 @@
         .is-live-mode #popupColorDropdown {
             max-height: 90px;
             overflow-y: auto;
+            overflow-x: hidden;
+            width: max-content;
+            padding-right: 18px; /* スクロールバー用のマージン */
+        }
+        
+        .is-live-mode #popupRiotIdDropdown .w-48 {
+            width: 14rem; /* 幅を少し広げてユーザー名の見切れを防ぐ */
         }
 
         .block-win {
@@ -2609,5 +2616,7 @@
         });
     </script>
 </body>
+
+</html>
 
 </html>
