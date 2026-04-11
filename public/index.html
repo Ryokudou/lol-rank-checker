@@ -788,7 +788,8 @@
                                         <div class="flex justify-end mt-1 px-1">
                                             <button
                                                 onclick="document.getElementById('obsGuide').classList.toggle('hidden')"
-                                                class="text-[10px] text-red-500 font-bold hover:text-red-400 underline underline-offset-2 transition-colors" data-i18n="lblObsGuideBtn">
+                                                class="text-[10px] text-red-500 font-bold hover:text-red-400 underline underline-offset-2 transition-colors"
+                                                data-i18n="lblObsGuideBtn">
                                                 OBSを使ってクロマキー以外で透過する場合
                                             </button>
                                         </div>
@@ -2289,7 +2290,7 @@
             const color = getTierColor(tier);
             let imgName = "";
             if (tier !== "UNRANKED") {
-                imgName = (tier === "IRON") ? "Iron.png" : `${tier.toLowerCase()}.png`;
+                imgName = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase() + ".png";
             }
             const imgSrc = imgName ? `png/${imgName}` : "";
 
@@ -2613,7 +2614,7 @@
                 iconContainer.classList.add('hidden');
             } else {
                 iconContainer.classList.remove('hidden');
-                let imgName = (data.tier === "IRON") ? "Iron.png" : `${data.tier.toLowerCase()}.png`;
+                let imgName = data.tier.charAt(0).toUpperCase() + data.tier.slice(1).toLowerCase() + ".png";
                 document.getElementById('rankIcon').src = `png/${imgName}`;
             }
 
