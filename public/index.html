@@ -870,7 +870,7 @@
                                     <div
                                         class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent blur-xl rounded-full">
                                     </div>
-                                    <img id="rankIcon" src="png/Iron.png"
+                                    <img id="rankIcon" src="public/png/Iron.png"
                                         class="relative w-48 h-48 object-contain drop-shadow-2xl transform hover:scale-110 transition-transform duration-300 select-none"
                                         alt="Rank Icon">
                                 </div>
@@ -2290,9 +2290,9 @@
             const color = getTierColor(tier);
             let imgName = "";
             if (tier !== "UNRANKED") {
-                imgName = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase() + ".png";
+                imgName = (tier === "IRON") ? "Iron.png" : `${tier.toLowerCase()}.png`;
             }
-            const imgSrc = imgName ? `png/${imgName}` : "";
+            const imgSrc = imgName ? `public/png/${imgName}` : "";
 
             // レイアウトが一致する場合、DOMの部分更新を行う（ちらつき防止）
             if (isLayoutMatch) {
@@ -2614,8 +2614,8 @@
                 iconContainer.classList.add('hidden');
             } else {
                 iconContainer.classList.remove('hidden');
-                let imgName = data.tier.charAt(0).toUpperCase() + data.tier.slice(1).toLowerCase() + ".png";
-                document.getElementById('rankIcon').src = `png/${imgName}`;
+                let imgName = (data.tier === "IRON") ? "Iron.png" : `${data.tier.toLowerCase()}.png`;
+                document.getElementById('rankIcon').src = `public/png/${imgName}`;
             }
 
             document.getElementById('totalWinCount').innerText = data.totalWins;
