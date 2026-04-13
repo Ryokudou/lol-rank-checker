@@ -1028,10 +1028,14 @@
                         </button>
                     </div>
                 </div>
+                <div class="flex items-center gap-1 mr-1 relative">
+                    <button id="popupStatsBtn" onclick="toggleStatsMode(event)" class="btn-live-toggle"
+                        style="background:#0ea5e9;">STATS</button>
+                </div>
                 <button id="transparentBtn" onclick="toggleTransparentMode()" class="btn-live-toggle"
-                    style="background:#8b5cf6; margin-right:4px;" data-i18n="lblPopupTransparent">透過</button>
+                    style="background:#8b5cf6; margin-right:4px;" data-i18n="lblPopupTransparent">透過(無)</button>
                 <button id="chromakeyBtn" onclick="toggleChromaKey()" class="btn-live-toggle"
-                    style="background:#10b981; margin-right:4px;" data-i18n="lblPopupChroma">CHROMA</button>
+                    style="background:#10b981; margin-right:4px;" data-i18n="lblPopupChroma">透過(無)</button>
                 <button id="modeToggleBtn" onclick="togglePopupMode()" class="btn-live-toggle"
                     data-i18n="liveModeOff">LIVE MODE: OFF</button>
                 <button onclick="closeFloatingPopup()"
@@ -1090,6 +1094,7 @@
         let isChromaKey = false;
         let currentStatsColor = localStorage.getItem('lol_stats_color') || '#ffffff';
         let currentFont = localStorage.getItem('lol_custom_font') || "'Inter', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif";
+        let statsMode = parseInt(localStorage.getItem('lol_stats_mode') || '0', 10); // 0: 20 Matches, 1: Today
 
         function changeFont() {
             const font = document.getElementById('fontSelect').value;
@@ -1138,6 +1143,22 @@
                 }
             }
             try { broadcastChannel.postMessage({ type: 'transparentChanged', level: transparentLevel }); } catch (e) { }
+        }
+
+        function toggleStatsMode(event) {
+            if (event) event.stopPropagation();
+            statsMode = (statsMode === 0) ? 1 : 0;
+            localStorage.setItem('lol_stats_mode', statsMode);
+            updateStatsModeBtn();
+            renderPopupContent();
+            try { broadcastChannel.postMessage({ type: 'statsModeChanged', mode: statsMode }); } catch (e) { }
+        }
+
+        function updateStatsModeBtn() {
+            const btn = document.getElementById('popupStatsBtn');
+            if (btn) {
+                btn.innerText = (statsMode === 0) ? t('lblPopupStats20') : t('lblPopupStatsToday');
+            }
         }
 
         function toggleChromaKey() {
@@ -1213,7 +1234,10 @@
                 lblPopupRefresh: "10分更新",
                 lblPopupRiotIdBtn: "Riot ID",
                 lblPopupFetchBtn: "取得",
-                lblPopupTransparent: "透過",
+                lblPopupStatsBtn: "戦績",
+                lblPopupStats20: "20戦",
+                lblPopupStatsToday: "今日",
+                lblPopupTransparent: "透過(無)",
                 lblPopupChroma: "CHROMA",
                 lblObsGuideBtn: "OBSを使ってクロマキー以外で透過する場合",
                 obsGuideText: "Chromeなどの「Webブラウザ」自体の仕様として、背景が透明なページを表示しようとすると、下地として「白色」で塗りつぶして表示してしまうので、OBSでポップアップURL(　https://lol-rank-checker.vercel.app/?mode=popup&live=1　)をブラウザソースを使用して読み込み、メニューの中から「対話」を選び操作してください。<br>ポップアップのRiot IDを選択し、ご自身のIDを入力してください。<br>ライブモードON時は、幅800高さ120くらい<br>ライブモードOFF時は、幅500高さ500くらいがちょうどいいサイズだと思います。"
@@ -1257,7 +1281,10 @@
                 lblPopupRefresh: "10m Refresh",
                 lblPopupRiotIdBtn: "Riot ID",
                 lblPopupFetchBtn: "Search",
-                lblPopupTransparent: "Transp.",
+                lblPopupStatsBtn: "Stats",
+                lblPopupStats20: "Last 20",
+                lblPopupStatsToday: "Today",
+                lblPopupTransparent: "Transp.(None)",
                 lblPopupChroma: "CHROMA",
                 lblObsGuideBtn: "OBS Transparency (Non-Chroma Key) Guide",
                 obsGuideText: "Due to web browser specifications, rendering a transparent background defaults to white. To fix this, load the popup URL ( https://lol-rank-checker.vercel.app/?mode=popup&live=1 ) in OBS as a Browser Source, right-click and select 'Interact' to operate it.<br>Click 'Riot ID' in the popup and enter your ID.<br>Recommended sizes:<br>Live Mode ON: Width 800, Height 120<br>Live Mode OFF: Width 500, Height 500"
@@ -1300,9 +1327,11 @@
                 regKr: "한국 (KR)",
                 lblPopupRefresh: "10분 갱신",
                 lblPopupRiotIdBtn: "Riot ID",
-                lblPopupFetchBtn: "검색",
-                lblPopupTransparent: "투명",
-                lblPopupChroma: "크로마",
+                lblPopupStatsBtn: "전적",
+                lblPopupStats20: "20경기",
+                lblPopupStatsToday: "오늘",
+                lblPopupTransparent: "투명(무)",
+                lblPopupChroma: "CHROMA",
                 lblObsGuideBtn: "OBS를 사용하여 크로마키 없이 투명화하는 방법",
                 obsGuideText: "크롬 등 웹 브라우저의 특성상 투명한 배경을 표시할 때 기본적으로 흰색 배경이 사용됩니다. 이를 방지하려면 OBS에서 팝업 URL ( https://lol-rank-checker.vercel.app/?mode=popup&live=1 )을 브라우저 소스로 불러온 후 메뉴에서 '상호작용'을 선택하여 조작해 주세요.<br>팝업에서 'Riot ID'를 선택하고 본인의 ID를 입력하세요.<br>권장 크기:<br>라이브 모드 ON: 너비 800, 높이 120<br>라이브 모드 OFF: 너비 500, 높이 500 정도가 적당합니다."
             },
@@ -1344,9 +1373,11 @@
                 regKr: "韩国 (KR)",
                 lblPopupRefresh: "10分钟更新",
                 lblPopupRiotIdBtn: "Riot ID",
-                lblPopupFetchBtn: "获取",
-                lblPopupTransparent: "透明",
-                lblPopupChroma: "绿幕",
+                lblPopupStatsBtn: "战绩",
+                lblPopupStats20: "20战",
+                lblPopupStatsToday: "今日",
+                lblPopupTransparent: "透明(无)",
+                lblPopupChroma: "CHROMA",
                 lblObsGuideBtn: "不使用绿幕实现OBS透明度指南",
                 obsGuideText: "由于Chrome等网页浏览器的特性，渲染透明背景时默认会显示白色底色。为了解决这个问题，请在OBS中将弹出窗口URL（ https://lol-rank-checker.vercel.app/?mode=popup&live=1 ）添加为浏览器源，右键点击选择“交互”进行操作。<br>在弹出窗口中选择“Riot ID”并输入您的ID。<br>推荐尺寸：<br>实时模式 开启：宽度 800，高度 120左右<br>实时模式 关闭：宽度 500，高度 500左右"
             }
@@ -1419,6 +1450,10 @@
                     } else if (event.data.type === 'updateData') {
                         currentData = event.data.payload;
                         displayFinalResults();
+                    } else if (event.data.type === 'statsModeChanged') {
+                        statsMode = event.data.mode;
+                        updateStatsModeBtn();
+                        renderPopupContent();
                     }
                 };
             }
@@ -1461,6 +1496,7 @@
 
                     changeLanguage();
                     updateModeBtn();
+                    updateStatsModeBtn();
                     renderPopupContent();
                     updatePopupRiotIdUI();
                     updatePopupFavoriteBtn();
@@ -1514,6 +1550,10 @@
                     if (popupGn) popupGn.value = event.data.gameName;
                     const popupReg = document.getElementById('popupRegion');
                     if (popupReg) popupReg.value = event.data.region;
+                } else if (event.data.type === 'statsModeChanged') {
+                    statsMode = event.data.mode;
+                    updateStatsModeBtn();
+                    renderPopupContent();
                 }
             };
         }
@@ -1605,6 +1645,7 @@
             }
 
             updateModeBtn();
+            updateStatsModeBtn();
             updateDynamicInputText();
             updatePopupRiotIdUI();
         }
@@ -2280,7 +2321,18 @@
             }
 
             const container = document.getElementById('popupContentContainer');
-            const { tier, rank, lp, wins, losses, history } = currentData;
+            let { tier, rank, lp, wins, losses, history } = currentData;
+
+            // 戦績モードが「今日」の場合、データをフィルタリング
+            if (statsMode === 1 && currentData.matches) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const startOfToday = today.getTime();
+
+                const todayMatches = currentData.matches.filter(m => m.timestamp >= startOfToday);
+                wins = todayMatches.filter(m => m.win === true).length;
+                losses = todayMatches.filter(m => m.win === false).length;
+            }
 
             // 現在の表示モードと一致するか確認
             const targetLayout = isLiveMode ? 'layout-live' : 'layout-normal';
@@ -2474,6 +2526,7 @@
 
                     let wins = 0, losses = 0;
                     let history = [];
+                    let matches = [];
                     let processedCount = 0;
 
                     const matchPromises = matchIds.map(async (matchId) => {
@@ -2486,7 +2539,7 @@
                             if (matchData && matchData.info && matchData.info.participants) {
                                 const participant = matchData.info.participants.find(p => p.puuid === accountData.puuid);
                                 if (participant) {
-                                    return participant.win;
+                                    return { win: participant.win, timestamp: matchData.info.gameStartTimestamp };
                                 }
                             }
                             return null;
@@ -2500,12 +2553,15 @@
                     const results = await Promise.all(matchPromises);
 
                     results.forEach(result => {
-                        if (result === true) { wins++; history.push(true); }
-                        else if (result === false) { losses++; history.push(false); }
+                        if (result) {
+                            if (result.win === true) { wins++; history.push(true); }
+                            else if (result.win === false) { losses++; history.push(false); }
+                            matches.push(result);
+                        }
                     });
 
                     updateStepUI('step-matches', 'success');
-                    return { wins, losses, history };
+                    return { wins, losses, history, matches };
                 })();
 
                 // Wait for both tasks
@@ -2521,6 +2577,7 @@
                     wins: matchStats.wins,
                     losses: matchStats.losses,
                     history: matchStats.history.slice(0, 20),
+                    matches: matchStats.matches,
                     totalWins: soloRank ? soloRank.wins : 0,
                     totalLosses: soloRank ? soloRank.losses : 0
                 };
